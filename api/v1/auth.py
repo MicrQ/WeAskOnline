@@ -1,6 +1,7 @@
+import datetime
 from flask import Blueprint, jsonify, request
-from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
+from werkzeug.security import generate_password_hash, check_password_hash
 
 user: dict = {
     "username": "lawsonredeye",
@@ -32,3 +33,48 @@ def login():
         return jsonify({"message": "Success", "api-token": token}), 200
     else:
         return jsonify({"error": "Incorrect password"})
+
+
+@auth.route('/register', methods=['POST'])
+def register():
+    """
+    handles the registering of new users using the data gotten via the
+    request.form
+
+    Return:
+        <Response 201> and redirects to the login page to confirm success
+    """
+    try:
+        username: str = request.form.get("username").replace(" ", "").lower()
+        password: str = request.form.get("password")
+        email: str = request.form.get("email")
+        first_name: str = request.form.get("firstname")
+        last_name: str = request.form.get("lastname")
+        country: str = request.form.get("country")
+
+        if not username:
+            return jsonify({"error": "Missing username"}), 400
+        elif not password:
+            return jsonify({"error": "Missing password"}), 400
+        elif not email:
+            return jsonify({"error": "Missing email address"}), 400
+        elif not first_name:
+            return jsonify({"error": "Missing first name"}), 400
+        elif not last_name:
+            return jsonify({"error": "Missing last name"}), 400
+        elif not country:
+            return jsonify({"error": "Missing country"}), 400
+
+        user_data: dict = {}
+        user_data['id'] = uuid4()
+        user_data['username'] = username
+        user_data['password'] = password
+        user_data['email'] = email
+        user_data['created_at'] = datetime.datetime.now()
+        return jsonify({
+            "message": "Success,user created",
+            "data": user_data
+            }), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Bad method, use POST"}), 500
