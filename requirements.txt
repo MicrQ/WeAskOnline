@@ -4,6 +4,11 @@ importlib-metadata==6.7.0
 itsdangerous==2.1.2
 Jinja2==3.1.4
 MarkupSafe==2.1.5
+mypy==1.4.1
+mypy-extensions==1.0.0
+pycodestyle==2.10.0
+tomli==2.0.1
+typed-ast==1.5.5
 typing_extensions==4.7.1
 Werkzeug==2.2.3
 zipp==3.15.0
