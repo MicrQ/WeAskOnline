@@ -73,7 +73,8 @@ def register():
         user_data['created_at'] = datetime.datetime.now()
         return jsonify({
             "message": "Success,user created",
-            "data": user_data
+            "data": user_data,
+            "link": "http://localhost:5000/login"
             }), 201
     except Exception as e:
         print(e)
