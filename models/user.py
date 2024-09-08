@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """ User Model definition """
 from models.base import Base, db
 from models.country import Country
@@ -23,3 +24,20 @@ class User(Base):
 
     country = db.relationship('Country',
                               backref=db.backref('users', lazy=True))
+
+    def __init__(self, firstname, lastname,
+                 bio, username, email, password,
+                 created_at, updated_at, country_id,
+                 profile_image=None, isActive=True):
+        """ User Initializer """
+        self.firstname = firstname
+        self.lastname = lastname
+        self.bio = bio
+        self.username = username
+        self.email = email
+        self.password = password
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.country_id = country_id
+        self.profile_image = profile_image
+        self.isActive = isActive
