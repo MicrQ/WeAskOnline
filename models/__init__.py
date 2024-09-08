@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from models.country import Country
-
-db = SQLAlchemy()
+from models.user import User
+from models.question import Question

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+""" flask app """
 from flask import Flask
 from api.v1.auth import auth
 from models.base import db
