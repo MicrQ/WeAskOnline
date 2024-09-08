@@ -23,6 +23,7 @@ class Question(Base):
     def __init__(self, title, body,
                  user_id, created_at,
                  updated_at, isActive):
+        """ Question Initializer """
         self.title = title
         self.body = body
         self.user_id = user_id
