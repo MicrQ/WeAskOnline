@@ -4,3 +4,4 @@ from models.question import Question
 from models.comment import Comment
 from models.reply import Reply
 from models.tag import Tag
+from models.question_tag import QuestionTag
