@@ -6,3 +6,4 @@ from models.reply import Reply
 from models.tag import Tag
 from models.question_tag import QuestionTag
 from models.role import Role
+from models.user_role import UserRole
