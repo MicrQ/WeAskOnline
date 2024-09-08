@@ -17,4 +17,15 @@ class Question(Base):
     user_id = db.Column(db.String(256),
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
-    user = db.relationship('User', backref=db.backref('questions', lazy=True))
+    user = db.relationship('User',
+                           backref=db.backref('questions', lazy=True))
+
+    def __init__(self, title, body,
+                 user_id, created_at,
+                 updated_at, isActive):
+        self.title = title
+        self.body = body
+        self.user_id = user_id
+        self.created_at = created_at
+        self.updated_at = updated_at
+        self.isActive = isActive
