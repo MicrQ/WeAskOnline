@@ -9,7 +9,8 @@ class Comment(db.Model):
     """ Comment model """
     __tablename__ = 'comments'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isEdited = db.Column(db.Boolean, nullable=False, default=False)

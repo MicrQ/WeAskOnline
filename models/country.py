@@ -7,7 +7,8 @@ class Country(db.Model):
     """ Country Model """
     __tablename__ = 'countries'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     name = db.Column(db.String(256), nullable=False, unique=True)
 
     def __init__(self, name):
