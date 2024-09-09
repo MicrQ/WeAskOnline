@@ -1,7 +1,13 @@
-import datetime
+#!/usr/bin/env python3
+from datetime import datetime, timezone
+from os import name
 from flask import Blueprint, jsonify, request
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from models.base import db
+from models.country import Country
+from models.user import User
 
 user: dict = {
     "username": "lawsonredeye",
@@ -11,7 +17,7 @@ user: dict = {
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/login', methods=['POST'])
+@auth.route('/api/v1/login', methods=['POST'])
 def login():
     """
     Handles the login feature of the User to check if the user has access
@@ -27,15 +33,22 @@ def login():
         return jsonify({"error": "Missing username"}), 400
     if password is None:
         return jsonify({"error": "Missing password"}), 400
+
     # make call to database to fetch user data and compare it
-    if check_password_hash(user["password"], password):
+    user = db.session.query(User).filter_by(username = username).first()
+    if user is None:
+        return jsonify({"error": "Invalid username"}), 400
+    if check_password_hash(user.password, password):
+        # store the token on the user cookie with key & token as value
         token: str = str(uuid4())
-        return jsonify({"message": "Success", "api-token": token}), 200
+        res = jsonify({"message": "Success", "api-token": token})
+        res.set_cookie('api-token', token, max_age = 60 * 60 * 24)
+        return res, 200
     else:
         return jsonify({"error": "Incorrect password"})
 
 
-@auth.route('/register', methods=['POST'])
+@auth.route('/api/v1/register', methods=['POST'])
 def register():
     """
     handles the registering of new users using the data gotten via the
@@ -47,10 +60,10 @@ def register():
     try:
         username: str = request.form.get("username").replace(" ", "").lower()
         password: str = request.form.get("password")
-        email: str = request.form.get("email")
-        first_name: str = request.form.get("firstname")
-        last_name: str = request.form.get("lastname")
-        country: str = request.form.get("country")
+        email: str = request.form.get("email").lower()
+        first_name: str = request.form.get("firstname").lower()
+        last_name: str = request.form.get("lastname").lower()
+        country: str = request.form.get("country").lower()
 
         if not username:
             return jsonify({"error": "Missing username"}), 400
@@ -65,17 +78,26 @@ def register():
         elif not country:
             return jsonify({"error": "Missing country"}), 400
 
+        FORMAT: str = "%Y-%m-%d %H:%M:%S"
+        country_id = "2"
         user_data: dict = {}
-        user_data['id'] = uuid4()
         user_data['username'] = username
-        user_data['password'] = password
+        user_data['bio'] = ''
+        user_data['firstname'] = first_name
+        user_data['lastname'] = last_name
+        user_data['password'] = generate_password_hash(password)
         user_data['email'] = email
-        user_data['created_at'] = datetime.datetime.now()
+        user_data['country_id'] = 1
+        user_data['created_at'] = datetime.now()
+        user_data['updated_at'] = datetime.now()
+        user = User(**user_data)
+        db.session.add(user)
+        db.session.commit()
         return jsonify({
-            "message": "Success,user created",
+            "message": "Success,user created. Please verifiy your email",
             "data": user_data,
             "link": "http://localhost:5000/login"
             }), 201
     except Exception as e:
         print(e)
-        return jsonify({"error": "Bad method, use POST"}), 500
+        return jsonify({"error": "Server error, empty data found"}), 500
