@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """ Question model definition """
 from models.user import User
-from models.base import Base, db
+from models.base import db
 
 
-class Question(Base):
+class Question(db.Model):
     """ Question model """
     __tablename__ = 'questions'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
