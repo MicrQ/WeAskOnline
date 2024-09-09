@@ -9,10 +9,6 @@ from models.base import db
 from models.country import Country
 from models.user import User
 
-user: dict = {
-    "username": "lawsonredeye",
-    "password": generate_password_hash("Iam groot")
-    }
 
 auth = Blueprint('auth', __name__)
 
