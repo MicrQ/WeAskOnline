@@ -9,6 +9,8 @@ class UserRole(Base):
     """ UserRole model """
     __tablename__ = 'user_roles'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     user_id = db.Column(db.String(256),
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)

@@ -8,6 +8,8 @@ class Question(Base):
     """ Question model """
     __tablename__ = 'questions'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)

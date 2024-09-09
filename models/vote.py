@@ -7,6 +7,8 @@ class Vote(Base):
     """ Vode model """
     __tablename__ = 'votes'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     is_upvote = db.Column(db.Boolean, nullable=False)
     user_id = db.Column(db.String(256),
                         db.ForeignKey('users.id'), nullable=False)

@@ -8,6 +8,9 @@ from models.user import User
 class Reply(Base):
     """ Base Model """
     __tablename__ = 'replies'
+
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isEdited = db.Column(db.Boolean, nullable=False, default=False)

@@ -9,6 +9,8 @@ class QuestionTag(Base):
     """ QuestionTag Model """
     __tablename__ = 'question_tags'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     question_id = db.Column(db.String(256),
                             db.ForeignKey('questions.id'), primary_key=True)
     tag_id = db.Column(db.String(256),

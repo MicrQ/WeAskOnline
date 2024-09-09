@@ -8,6 +8,8 @@ class User(Base):
     """ User model """
     __tablename__ = 'users'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     firstname = db.Column(db.String(256), nullable=False)
     lastname = db.Column(db.String(256), nullable=False)
     bio = db.Column(db.String(256))
