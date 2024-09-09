@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from datetime import datetime, timezone
 from os import name
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, make_response, request
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -31,14 +31,14 @@ def login():
         return jsonify({"error": "Missing password"}), 400
 
     # make call to database to fetch user data and compare it
-    user = db.session.query(User).filter_by(username = username).first()
+    user = db.session.query(User).filter_by(username=username).first()
     if user is None:
         return jsonify({"error": "Invalid username"}), 400
     if check_password_hash(user.password, password):
         # store the token on the user cookie with key & token as value
         token: str = str(uuid4())
         res = jsonify({"message": "Success", "api-token": token})
-        res.set_cookie('api-token', token, max_age = 60 * 60 * 24)
+        res.set_cookie('api-token', token, max_age=60 * 60 * 24)
         return res, 200
     else:
         return jsonify({"error": "Incorrect password"})
@@ -97,3 +97,14 @@ def register():
     except Exception as e:
         print(e)
         return jsonify({"error": "Server error, empty data found"}), 500
+
+
+@auth.route('/api/v1/logout', methods=['GET'])
+def logout():
+    """\
+    Deletes the found token from the cookie stored in the user's browser and
+    also logs out the user
+    """
+    res = jsonify({"message": "Logged out successfully"})
+    res.delete_cookie('api-token')
+    return res, 204
