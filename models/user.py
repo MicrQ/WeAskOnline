@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """ User Model definition """
-from models.base import Base, db
+from models.base import db
 from models.country import Country
 
 
-class User(Base):
+class User(db.Model):
     """ User model """
     __tablename__ = 'users'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     firstname = db.Column(db.String(256), nullable=False)
     lastname = db.Column(db.String(256), nullable=False)
     bio = db.Column(db.String(256))

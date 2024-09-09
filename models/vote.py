@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """ Vote model definition """
-from models.base import Base, db
+from models.base import db
 
 
-class Vote(Base):
+class Vote(db.Model):
     """ Vode model """
     __tablename__ = 'votes'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     is_upvote = db.Column(db.Boolean, nullable=False)
     user_id = db.Column(db.String(256),
                         db.ForeignKey('users.id'), nullable=False)

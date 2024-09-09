@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """ Question model definition """
-from models.base import Base, db
+from models.base import db
 from models.user import User
 from models.question import Question
 
 
-class Comment(Base):
+class Comment(db.Model):
     """ Comment model """
     __tablename__ = 'comments'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isEdited = db.Column(db.Boolean, nullable=False, default=False)

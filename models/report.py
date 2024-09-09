@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 """ Report model definition """
-from models.base import Base, db
+from models.base import db
 
 
-class Report(Base):
+class Report(db.Model):
     """ Report model """
     __tablename__ = 'reports'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     reason = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isResolved = db.Column(db.Boolean, nullable=False, default=False)

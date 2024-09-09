@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """ UserRoles model definition """
-from models.base import Base, db
+from models.base import db
 from models.user import User
 from models.role import Role
 
 
-class UserRole(Base):
+class UserRole(db.Model):
     """ UserRole model """
     __tablename__ = 'user_roles'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     user_id = db.Column(db.String(256),
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
