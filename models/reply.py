@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """ Replay model definition """
-from models.base import Base, db
+from models.base import db
 from models.comment import Comment
 from models.user import User
 
 
-class Reply(Base):
+class Reply(db.Model):
     """ Base Model """
     __tablename__ = 'replies'
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ Country model definition """
-from models.base import db, Base
+from models.base import db
 
 
 class Country(db.Model):

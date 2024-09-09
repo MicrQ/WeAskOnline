@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """ User Model definition """
-from models.base import Base, db
+from models.base import db
 from models.country import Country
 
 
-class User(Base):
+class User(db.Model):
     """ User model """
     __tablename__ = 'users'
 

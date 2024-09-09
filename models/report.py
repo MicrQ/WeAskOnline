@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """ Report model definition """
-from models.base import Base, db
+from models.base import db
 
 
-class Report(Base):
+class Report(db.Model):
     """ Report model """
     __tablename__ = 'reports'
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """ Tag model implementation """
-from models.base import Base, db
+from models.base import db
 
 
-class Tag(Base):
+class Tag(db.Model):
     """ Tag model """
     __tablename__ = 'tags'
 

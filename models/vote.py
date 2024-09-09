@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """ Vote model definition """
-from models.base import Base, db
+from models.base import db
 
 
-class Vote(Base):
+class Vote(db.Model):
     """ Vode model """
     __tablename__ = 'votes'
 
