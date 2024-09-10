@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+from crypt import methods
 from datetime import datetime, timezone
+import json
 from os import name
 from flask import Blueprint, jsonify, make_response, request
 from uuid import uuid4
@@ -108,3 +110,27 @@ def logout():
     res = jsonify({"message": "Logged out successfully"})
     res.delete_cookie('api-token')
     return res, 204
+
+
+@auth.route('/api/v1/reset-password', methods=["POST"])
+def reset_password():
+    """\
+    route for handling password reset for users that has forgotten their password
+    and also checks if the email is stored in the database
+    """
+    data = request.get_json()
+    password: str = str(data['password'])
+    if not data['email']:
+        return jsonify({"error": "Please provide email address"}), 400
+    if not data['password']:
+        return jsonify({"error": "provide password"}), 400
+    try:
+        user_email = db.session.query(User).filter_by(email=data['email']).first()
+        user_email.password = generate_password_hash(password)
+        db.session.commit()
+        db.session.close()
+        return jsonify({"message": "Success, password changed"}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({"error": e}), 500
+    
