@@ -7,14 +7,13 @@ from models.country import Country
 from models.comment import Comment
 from models.reply import Reply
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import unittest
 from datetime import datetime, timezone
 from sqlalchemy import text
 
 
-class testQuestionModel(unittest.TestCase):
-    """ test class for User model """
+class testReplyModel(unittest.TestCase):
+    """ test class for Reply model """
 
     def setUp(self):
         """ setup the in memory db and create the table """

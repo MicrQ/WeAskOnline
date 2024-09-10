@@ -6,14 +6,13 @@ from models.question import Question
 from models.country import Country
 from models.comment import Comment
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import unittest
 from datetime import datetime, timezone
 from sqlalchemy import text
 
 
-class testUserModel(unittest.TestCase):
-    """ test class for User model """
+class testCommentModel(unittest.TestCase):
+    """ test class for Comment model """
 
     def setUp(self):
         """ setup the in memory db and create the table """

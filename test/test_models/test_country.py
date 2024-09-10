@@ -3,7 +3,6 @@
 from models.base import db
 from models.country import Country
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import unittest
 
 

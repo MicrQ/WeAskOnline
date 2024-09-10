@@ -3,12 +3,11 @@
 from models.base import db
 from models.role import Role
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import unittest
 
 
 class testRoleModel(unittest.TestCase):
-    """ test class for Country model """
+    """ test class for Role model """
 
     def setUp(self):
         """ setup the in memory db and create the table """

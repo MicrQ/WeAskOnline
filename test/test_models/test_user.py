@@ -4,7 +4,6 @@ from models.base import db
 from models.user import User
 from models.country import Country
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import unittest
 from datetime import datetime, timezone
 from sqlalchemy import text
