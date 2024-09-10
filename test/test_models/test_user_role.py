@@ -75,7 +75,8 @@ class testQuestionTagModel(unittest.TestCase):
         db.session.add(new_user_role)
         db.session.commit()
 
-        user_role = db.session.query(UserRole).filter_by(user_id=user.id).first()
+        user_role = db.session.query(
+            UserRole).filter_by(user_id=user.id).first()
         self.assertIsNotNone(user_role)
 
         # test with invalid user_id

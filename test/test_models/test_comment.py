@@ -60,11 +60,11 @@ class testCommentModel(unittest.TestCase):
         self.assertIsNotNone(user)
 
         new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = user.id,
-            created_at = now,
-            updated_at = now,
+            title="What is python",
+            body="I want someone to tell me what python is.",
+            user_id=user.id,
+            created_at=now,
+            updated_at=now,
         )
 
         db.session.add(new_question)
@@ -75,10 +75,10 @@ class testCommentModel(unittest.TestCase):
 
         # creating comment properly
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = user.id,
-            question_id = question.id
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=user.id,
+            question_id=question.id
         )
 
         db.session.add(new_comment)
@@ -89,10 +89,10 @@ class testCommentModel(unittest.TestCase):
 
         # creating comment with invalid user id
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = -1,
-            question_id = question.id
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=-1,
+            question_id=question.id
         )
 
         db.session.add(new_comment)
@@ -102,10 +102,10 @@ class testCommentModel(unittest.TestCase):
 
         # creating comment with invalid question id
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = user.id,
-            question_id = -1
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=user.id,
+            question_id=-1
         )
 
         db.session.add(new_comment)

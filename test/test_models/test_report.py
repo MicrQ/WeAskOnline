@@ -62,11 +62,11 @@ class testReportModel(unittest.TestCase):
         self.assertIsNotNone(user)
 
         new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = user.id,
-            created_at = now,
-            updated_at = now,
+            title="What is python",
+            body="I want someone to tell me what python is.",
+            user_id=user.id,
+            created_at=now,
+            updated_at=now
         )
 
         db.session.add(new_question)
@@ -77,10 +77,10 @@ class testReportModel(unittest.TestCase):
 
         # creating comment properly
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = user.id,
-            question_id = question.id
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=user.id,
+            question_id=question.id
         )
 
         db.session.add(new_comment)
@@ -90,10 +90,10 @@ class testReportModel(unittest.TestCase):
         self.assertIsNotNone(comment)
 
         new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = user.id,
-            comment_id = comment.id
+            body="i know it is.",
+            created_at=now,
+            user_id=user.id,
+            comment_id=comment.id
         )
         db.session.add(new_reply)
         db.session.commit()
@@ -104,10 +104,10 @@ class testReportModel(unittest.TestCase):
         # reporting reply properly
         new_report = Report(
             reason="voilation",
-            user_id = user.id,
+            user_id=user.id,
             parent_type='reply',
-            parent_id= reply.id,
-            created_at = now
+            parent_id=reply.id,
+            created_at=now
         )
         db.session.add(new_report)
         db.session.commit()
@@ -119,10 +119,10 @@ class testReportModel(unittest.TestCase):
         # reporting comment
         new_report = Report(
             reason="voilation",
-            user_id = user.id,
+            user_id=user.id,
             parent_type='comment',
-            parent_id= comment.id,
-            created_at = now
+            parent_id=comment.id,
+            created_at=now
         )
         report = db.session.query(Report).filter_by(
             parent_type='comment', parent_id=comment.id).first()
@@ -131,10 +131,10 @@ class testReportModel(unittest.TestCase):
         # reporting question
         new_report = Report(
             reason="voilation",
-            user_id = user.id,
+            user_id=user.id,
             parent_type='question',
-            parent_id= question.id,
-            created_at = now
+            parent_id=question.id,
+            created_at=now
         )
         report = db.session.query(Report).filter_by(
             parent_type='question', parent_id=question.id).first()
@@ -143,10 +143,10 @@ class testReportModel(unittest.TestCase):
         # reporting user
         new_report = Report(
             reason="voilation",
-            user_id = user.id,
+            user_id=user.id,
             parent_type='user',
-            parent_id= user.id,
-            created_at = now
+            parent_id=user.id,
+            created_at=now
         )
         report = db.session.query(Report).filter_by(
             parent_type='user', parent_id=user.id).first()

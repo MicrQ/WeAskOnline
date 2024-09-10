@@ -63,11 +63,11 @@ class testVoteModel(unittest.TestCase):
         self.assertIsNotNone(user)
 
         new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = user.id,
-            created_at = now,
-            updated_at = now,
+            title="What is python",
+            body="I want someone to tell me what python is.",
+            user_id=user.id,
+            created_at=now,
+            updated_at=now,
         )
 
         db.session.add(new_question)
@@ -78,10 +78,10 @@ class testVoteModel(unittest.TestCase):
 
         # creating comment properly
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = user.id,
-            question_id = question.id
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=user.id,
+            question_id=question.id
         )
 
         db.session.add(new_comment)
@@ -91,10 +91,10 @@ class testVoteModel(unittest.TestCase):
         self.assertIsNotNone(comment)
 
         new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = user.id,
-            comment_id = comment.id
+            body="i know it is.",
+            created_at=now,
+            user_id=user.id,
+            comment_id=comment.id
         )
         db.session.add(new_reply)
         db.session.commit()
@@ -104,10 +104,10 @@ class testVoteModel(unittest.TestCase):
 
         # voting reply properly
         new_vote = Vote(
-            is_upvote = True,
-            user_id = user.id,
-            parent_type = 'reply',
-            parent_id = reply.id
+            is_upvote=True,
+            user_id=user.id,
+            parent_type='reply',
+            parent_id=reply.id
         )
         db.session.add(new_vote)
         db.session.commit()
@@ -118,10 +118,10 @@ class testVoteModel(unittest.TestCase):
 
         # voting comment properly
         new_vote = Vote(
-            is_upvote = True,
-            user_id = user.id,
-            parent_type = 'comment',
-            parent_id = comment.id
+            is_upvote=True,
+            user_id=user.id,
+            parent_type='comment',
+            parent_id=comment.id
         )
         db.session.add(new_vote)
         db.session.commit()
@@ -132,10 +132,10 @@ class testVoteModel(unittest.TestCase):
 
         # voting question properly
         new_vote = Vote(
-            is_upvote = True,
-            user_id = user.id,
-            parent_type = 'question',
-            parent_id = question.id
+            is_upvote=True,
+            user_id=user.id,
+            parent_type='question',
+            parent_id=question.id
         )
         db.session.add(new_vote)
         db.session.commit()

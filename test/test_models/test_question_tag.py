@@ -61,11 +61,11 @@ class testQuestionTagModel(unittest.TestCase):
         self.assertIsNotNone(user)
 
         new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = user.id,
-            created_at = now,
-            updated_at = now,
+            title="What is python",
+            body="I want someone to tell me what python is.",
+            user_id=user.id,
+            created_at=now,
+            updated_at=now,
         )
 
         db.session.add(new_question)
@@ -83,7 +83,8 @@ class testQuestionTagModel(unittest.TestCase):
         new_question_tag = QuestionTag(question_id=question.id, tag_id=tag.id)
         db.session.add(new_question_tag)
         db.session.commit()
-        question_tag = db.session.query(QuestionTag).filter_by(question_id=question.id).first()
+        question_tag = db.session.query(QuestionTag).filter_by(
+            question_id=question.id).first()
         self.assertIsNotNone(question_tag)
 
         # test with invalid tag id

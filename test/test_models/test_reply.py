@@ -61,11 +61,11 @@ class testReplyModel(unittest.TestCase):
         self.assertIsNotNone(user)
 
         new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = user.id,
-            created_at = now,
-            updated_at = now,
+            title="What is python",
+            body="I want someone to tell me what python is.",
+            user_id=user.id,
+            created_at=now,
+            updated_at=now
         )
 
         db.session.add(new_question)
@@ -76,10 +76,10 @@ class testReplyModel(unittest.TestCase):
 
         # creating reply properly
         new_comment = Comment(
-            body = "Python is a programming language.",
-            created_at = now,
-            user_id = user.id,
-            question_id = question.id
+            body="Python is a programming language.",
+            created_at=now,
+            user_id=user.id,
+            question_id=question.id
         )
 
         db.session.add(new_comment)
@@ -89,10 +89,10 @@ class testReplyModel(unittest.TestCase):
         self.assertIsNotNone(comment)
 
         new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = user.id,
-            comment_id = comment.id
+            body="i know it is.",
+            created_at=now,
+            user_id=user.id,
+            comment_id=comment.id
         )
         db.session.add(new_reply)
         db.session.commit()
@@ -102,10 +102,10 @@ class testReplyModel(unittest.TestCase):
 
         # create reply with invalid comment id
         new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = user.id,
-            comment_id = -1
+            body="i know it is.",
+            created_at=now,
+            user_id=user.id,
+            comment_id=-1
         )
         db.session.add(new_reply)
         with self.assertRaises(Exception):
@@ -114,10 +114,10 @@ class testReplyModel(unittest.TestCase):
 
         # create reply with invalid user id
         new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = -1,
-            comment_id = comment.id
+            body="i know it is.",
+            created_at=now,
+            user_id=-1,
+            comment_id=comment.id
         )
         db.session.add(new_reply)
         with self.assertRaises(Exception):
