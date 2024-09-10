@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" test for User model """
+""" test for tag model """
 from models.base import db
 from models.tag import Tag
 from flask import Flask

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" test for User model """
+""" test for Comment model """
 from models.base import db
 from models.user import User
 from models.question import Question
