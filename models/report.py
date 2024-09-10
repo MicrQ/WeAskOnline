@@ -28,5 +28,5 @@ class Report(db.Model):
         self.reason = reason
         self.created_at = created_at
         self.parent_id = parent_id
-        self.parent_type = parent_type
+        self.parent_type = parent_type.lower()
         self.user_id = user_id
