@@ -18,6 +18,10 @@ class Vote(db.Model):
     user = db.relationship('User',
                            backref=db.backref('votes', lazy=True))
 
-    def __init__(self, is_upvote):
+    def __init__(self, is_upvote, user_id,
+                 parent_id, parent_type):
         """ Vote Initializer """
         self.is_upvote = is_upvote
+        self.user_id = user_id,
+        self.parent_id = parent_id,
+        self.parent_type = parent_type.lower()

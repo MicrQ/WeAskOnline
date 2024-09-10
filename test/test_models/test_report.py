@@ -13,7 +13,7 @@ from sqlalchemy import text
 from datetime import datetime, timezone
 
 
-class testQuestionTagModel(unittest.TestCase):
+class testReportModel(unittest.TestCase):
     """ test class for Report model """
 
     def setUp(self):
