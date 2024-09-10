@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-""" test for Reply model """
+""" test for Report model """
 from models.base import db
-from models.user import User
-from models.question import Question
-from models.country import Country
-from models.comment import Comment
 from models.reply import Reply
+from models.comment import Comment
+from models.question import Question
+from models.user import User
+from models.country import Country
+from models.report import Report
 from flask import Flask
 import unittest
-from datetime import datetime, timezone
 from sqlalchemy import text
+from datetime import datetime, timezone
 
 
-class testReplyModel(unittest.TestCase):
-    """ test class for Reply model """
+class testQuestionTagModel(unittest.TestCase):
+    """ test class for Report model """
 
     def setUp(self):
         """ setup the in memory db and create the table """
@@ -32,8 +33,8 @@ class testReplyModel(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_reply(self):
-        """ test for creating reply """
+    def test_create_report(self):
+        """ test for creating report """
         new_country = Country(name='France')
         db.session.add(new_country)
         db.session.commit()
@@ -74,7 +75,7 @@ class testReplyModel(unittest.TestCase):
         question = db.session.query(Question).filter_by(created_at=now).first()
         self.assertIsNotNone(question)
 
-        # creating reply properly
+        # creating comment properly
         new_comment = Comment(
             body = "Python is a programming language.",
             created_at = now,
@@ -100,30 +101,57 @@ class testReplyModel(unittest.TestCase):
         reply = db.session.query(Reply).filter_by(created_at=now).first()
         self.assertIsNotNone(reply)
 
-        # create reply with invalid comment id
-        new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
+        # reporting reply properly
+        new_report = Report(
+            reason="voilation",
             user_id = user.id,
-            comment_id = -1
+            parent_type='reply',
+            parent_id= reply.id,
+            created_at = now
         )
-        db.session.add(new_reply)
-        with self.assertRaises(Exception):
-            db.session.commit()
-        db.session.rollback()
+        db.session.add(new_report)
+        db.session.commit()
 
-        # create reply with invalid user id
-        new_reply = Reply(
-            body = "i know it is.",
-            created_at = now,
-            user_id = -1,
-            comment_id = comment.id
+        report = db.session.query(Report).filter_by(
+            parent_type='reply', parent_id=reply.id).first()
+        self.assertIsNotNone(report)
+
+        # reporting comment
+        new_report = Report(
+            reason="voilation",
+            user_id = user.id,
+            parent_type='comment',
+            parent_id= comment.id,
+            created_at = now
         )
-        db.session.add(new_reply)
-        with self.assertRaises(Exception):
-            db.session.commit()
-        db.session.rollback()
+        report = db.session.query(Report).filter_by(
+            parent_type='comment', parent_id=comment.id).first()
+        self.assertIsNone(report)
+
+        # reporting question
+        new_report = Report(
+            reason="voilation",
+            user_id = user.id,
+            parent_type='question',
+            parent_id= question.id,
+            created_at = now
+        )
+        report = db.session.query(Report).filter_by(
+            parent_type='question', parent_id=question.id).first()
+        self.assertIsNone(report)
+
+        # reporting user
+        new_report = Report(
+            reason="voilation",
+            user_id = user.id,
+            parent_type='user',
+            parent_id= user.id,
+            created_at = now
+        )
+        report = db.session.query(Report).filter_by(
+            parent_type='user', parent_id=user.id).first()
+        self.assertIsNone(report)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
