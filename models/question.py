@@ -24,11 +24,10 @@ class Question(db.Model):
 
     def __init__(self, title, body,
                  user_id, created_at,
-                 updated_at, isActive):
+                 updated_at):
         """ Question Initializer """
         self.title = title
         self.body = body
         self.user_id = user_id
         self.created_at = created_at
         self.updated_at = updated_at
-        self.isActive = isActive
