@@ -25,10 +25,9 @@ class Reply(db.Model):
                               backref=db.backref('replies', lazy=True))
 
     def __init__(self, body, created_at,
-                 isEdited, user_id, comment_id):
+                 user_id, comment_id):
         """ Reply model initializer """
         self.body = body
         self.created_at = created_at
         self.user_id = user_id
         self.comment_id = comment_id
-        self.isEdited = isEdited
