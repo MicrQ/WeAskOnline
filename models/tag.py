@@ -13,4 +13,4 @@ class Tag(db.Model):
 
     def __init__(self, name):
         """ Tag Initializer """
-        self.name = name
+        self.name = name.lower()

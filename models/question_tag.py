@@ -12,9 +12,11 @@ class QuestionTag(db.Model):
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, nullable=False)
     question_id = db.Column(db.String(256),
-                            db.ForeignKey('questions.id', ondelete='CASCADE'), nullable=False)
+                            db.ForeignKey('questions.id', ondelete='CASCADE'),
+                            nullable=False)
     tag_id = db.Column(db.String(256),
-                       db.ForeignKey('tags.id', ondelete='CASCADE'), nullable=False)
+                       db.ForeignKey('tags.id', ondelete='CASCADE'),
+                       nullable=False)
 
     question = db.relationship('Question',
                                backref=db.backref(
