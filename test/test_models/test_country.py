@@ -31,6 +31,12 @@ class testCountryModel(unittest.TestCase):
 
         country = Country.query.filter_by(name="France").first()
         self.assertIsNotNone(country)
+        self.assertEqual(country.name, "France")
+
+        duplicate_country = Country(name="France")
+        db.session.add(duplicate_country)
+        with self.assertRaises(Exception):
+            db.session.commit()
 
 
 if __name__ == '__main__':
