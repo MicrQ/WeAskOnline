@@ -26,10 +26,9 @@ class Comment(db.Model):
                                backref=db.backref('comments', lazy=True))
 
     def __init__(self, body, created_at,
-                 isEdited, user_id, question_id):
+                 user_id, question_id):
         """ Comment model initializer """
         self.body = body
         self.created_at = created_at
-        self.isEdited = isEdited
         self.user_id = user_id
         self.question_id = question_id
