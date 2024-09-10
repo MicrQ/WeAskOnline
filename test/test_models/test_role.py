@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-""" test for country model """
+""" test for role model """
 from models.base import db
-from models.country import Country
+from models.role import Role
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import unittest
 
 
-class testCountryModel(unittest.TestCase):
+class testRoleModel(unittest.TestCase):
     """ test class for Country model """
 
     def setUp(self):
@@ -25,18 +25,18 @@ class testCountryModel(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_country_creation(self):
-        """ test creating new country """
-        new_country = Country(name="France")
-        db.session.add(new_country)
+    def test_role_creation(self):
+        """ test creating new role """
+        new_role = Role(name="Admin")
+        db.session.add(new_role)
         db.session.commit()
 
-        country = Country.query.filter_by(name="France").first()
-        self.assertIsNotNone(country)
-        self.assertEqual(country.name, "France")
+        role = Role.query.filter_by(name="Admin").first()
+        self.assertIsNotNone(role)
+        self.assertEqual(role.name, "Admin")
 
-        duplicate_country = Country(name="France")
-        db.session.add(duplicate_country)
+        duplicate_role = Role(name="Admin")
+        db.session.add(duplicate_role)
         with self.assertRaises(Exception):
             db.session.commit()
 
