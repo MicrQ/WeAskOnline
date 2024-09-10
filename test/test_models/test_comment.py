@@ -4,6 +4,7 @@ from models.base import db
 from models.user import User
 from models.question import Question
 from models.country import Country
+from models.comment import Comment
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import unittest
@@ -11,7 +12,7 @@ from datetime import datetime, timezone
 from sqlalchemy import text
 
 
-class testQuestionModel(unittest.TestCase):
+class testUserModel(unittest.TestCase):
     """ test class for User model """
 
     def setUp(self):
@@ -31,8 +32,8 @@ class testQuestionModel(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_question(self):
-        """ test create question """
+    def test_create_comment(self):
+        """ test create comment """
         new_country = Country(name='France')
         db.session.add(new_country)
         db.session.commit()
@@ -70,24 +71,48 @@ class testQuestionModel(unittest.TestCase):
         db.session.add(new_question)
         db.session.commit()
 
-        question = db.session.query(Question).filter_by(created_at=now).first
+        question = db.session.query(Question).filter_by(created_at=now).first()
         self.assertIsNotNone(question)
 
-    def test_invalid_user_id(self):
-        """ test invalid user id """
-        now = datetime.now(timezone.utc)
-        new_question = Question(
-            title = "What is python",
-            body = "I want someone to tell me what python is.",
-            user_id = -1,
+        # creating comment properly
+        new_comment = Comment(
+            body = "Python is a programming language.",
             created_at = now,
-            updated_at = now,
+            user_id = user.id,
+            question_id = question.id
         )
 
-        db.session.add(new_question)
+        db.session.add(new_comment)
+        db.session.commit()
+
+        comment = db.session.query(Comment).filter_by(created_at=now).first()
+        self.assertIsNotNone(comment)
+
+        # creating comment with invalid user id
+        new_comment = Comment(
+            body = "Python is a programming language.",
+            created_at = now,
+            user_id = -1,
+            question_id = question.id
+        )
+
+        db.session.add(new_comment)
+        with self.assertRaises(Exception):
+            db.session.commit()
+        db.session.rollback()
+
+        # creating comment with invalid question id
+        new_comment = Comment(
+            body = "Python is a programming language.",
+            created_at = now,
+            user_id = user.id,
+            question_id = -1
+        )
+
+        db.session.add(new_comment)
         with self.assertRaises(Exception):
             db.session.commit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
