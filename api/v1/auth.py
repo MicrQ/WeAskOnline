@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-from crypt import methods
-from datetime import datetime, timezone
-import json
+from datetime import datetime
 from os import name
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, Response, jsonify, make_response, request
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.base import db
 from models.country import Country
 from models.user import User
+from utils.email_controller import send_token, verify_token
 
 
 auth = Blueprint('auth', __name__)
@@ -61,7 +60,7 @@ def register():
         email: str = request.form.get("email").lower()
         first_name: str = request.form.get("firstname").lower()
         last_name: str = request.form.get("lastname").lower()
-        country: str = request.form.get("country").lower()
+        country: str = request.form.get("country").title()
 
         if not username:
             return jsonify({"error": "Missing username"}), 400
@@ -76,8 +75,9 @@ def register():
         elif not country:
             return jsonify({"error": "Missing country"}), 400
 
-        FORMAT: str = "%Y-%m-%d %H:%M:%S"
-        country_id = "2"
+        # Inputing user's data into database
+        country_id = db.session.query(Country).filter_by(name=country).first()
+        print(country_id.id)
         user_data: dict = {}
         user_data['username'] = username
         user_data['bio'] = ''
@@ -85,20 +85,43 @@ def register():
         user_data['lastname'] = last_name
         user_data['password'] = generate_password_hash(password)
         user_data['email'] = email
-        user_data['country_id'] = 1
+        user_data['country_id'] = country_id.id
         user_data['created_at'] = datetime.now()
         user_data['updated_at'] = datetime.now()
         user = User(**user_data)
         db.session.add(user)
         db.session.commit()
+
+        # Send OTP to user email for verification
+        OTP = send_token(email)
+        if not OTP:
+            return jsonify({'error': 'email not sent'}), 400
+        resp = make_response('hello')
+        resp.headers['auth'] = OTP
         return jsonify({
             "message": "Success,user created. Please verifiy your email",
             "data": user_data,
-            "link": "http://localhost:5000/login"
+            "link": "http://localhost:5000/verify-email"
             }), 201
     except Exception as e:
         print(e)
-        return jsonify({"error": "Server error, empty data found"}), 500
+        return jsonify({"error": "Server make_response('hello')error, empty data found"}), 500
+
+
+@auth.route('/api/v1/verify-email', methods=['POST'])
+def verify_email():
+    """
+    Route for handling and processing email
+    """
+    data = request.get_json()
+    if not data or data['email']:
+        return jsonify({"error": "Missing email address"}), 400
+    otp = Response.auth
+    result = verify_token(int(data['token']), int(otp))
+    if result:
+        return jsonify({'message': 'success, email verified'}), 200
+    else:
+        return jsonify({'error': 'email not verified'}), 401
 
 
 @auth.route('/api/v1/logout', methods=['GET'])
