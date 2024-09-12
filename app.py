@@ -3,6 +3,7 @@
 from flask import Flask
 from api.v1.auth import auth
 from models.base import db
+from api.v1.route import home
 from sqlalchemy import text
 
 
@@ -14,6 +15,7 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = '' # production db uri here
 db.init_app(app)
 app.register_blueprint(auth)
+app.register_blueprint(home)
 
 with app.app_context():
     if onDevelopment:
