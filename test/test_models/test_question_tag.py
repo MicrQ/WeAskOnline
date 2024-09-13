@@ -64,14 +64,13 @@ class testQuestionTagModel(unittest.TestCase):
             title="What is python",
             body="I want someone to tell me what python is.",
             user_id=user.id,
-            created_at=now,
-            updated_at=now,
+            updated_at=now
         )
 
         db.session.add(new_question)
         db.session.commit()
 
-        question = db.session.query(Question).filter_by(created_at=now).first()
+        question = db.session.query(Question).filter_by(id=new_question.id).first()
         self.assertIsNotNone(question)
 
         new_tag = Tag(name='python')

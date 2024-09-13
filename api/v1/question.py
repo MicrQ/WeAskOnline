@@ -18,7 +18,7 @@ def create_question():
     """ Handles question creation for logged in user """
     token = request.cookies.get('api-token')
     if not token:
-        return redirect('/api/v1/login')
+        abort(401)
 
     redis = RedisServer()
     username = redis.get(token)
@@ -62,7 +62,9 @@ def create_question():
             db.session.add(question_tag)
             db.session.commit()
 
-        return jsonify({'message': 'Question created'}), 201
+    return jsonify({'message': 'Question created'}), 201
 
 
-# @question.route('api/v1/')
+# @question.route('api/v1/questions/<int:id>')
+# def update_question(id):
+#     """ endpoint used to  """
