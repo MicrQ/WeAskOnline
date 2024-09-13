@@ -162,8 +162,6 @@ def verify_email():
     user_data = {k.decode(): v.decode() for k, v in user_data.items()}
     user_data['created_at'] = datetime.now()
     user_data['updated_at'] = datetime.now()
-    print(user_data)
-    print(type(user_data))
     
     otp = user_data.get('token')
 
