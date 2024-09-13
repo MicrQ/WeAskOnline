@@ -7,7 +7,7 @@ from api.V1.feedRoutes import feed_routes
 # Initialize blueprint
 api_v1 = Blueprint('api_v1', __name__)
 
-# Register all routes
+# Register all routes with their respective URL prefixes
 api_v1.register_blueprint(user_routes, url_prefix='/users')
 api_v1.register_blueprint(question_routes, url_prefix='/questions')
 api_v1.register_blueprint(tag_routes, url_prefix='/tags')

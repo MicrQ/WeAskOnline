@@ -11,14 +11,13 @@ feed_routes = Blueprint('feed_routes', __name__)
 def get_feed():
     """
     Handles retrieving the feed for the user which includes
-    questions, comments, or any other relevant items for the feed.
-    This fetches data from multiple tables such as Questions,
-    Users, Comments, etc.
+    questions and user details for the feed.
+    This fetches data from the Questions and Users tables.
 
     Returns:
         JSON object with the feed data and HTTP 200 status.
     """
-    # Fetch recent questions ( pulling the latest 10 questions)
+    # Fetch recent questions (pulling the latest 10 questions)
     query = Question.query.order_by(desc(Question.created_at))
     recent_questions = query.limit(10).all()
 
@@ -26,19 +25,30 @@ def get_feed():
 
     for question in recent_questions:
         # Retrieve user who posted the question
-        user = User.query.filter_by(id=question.user_id).first()
-
+        user = User.query.get(question.user_id)
+        
+        # Check if user exists
+        if user:
+            user_data = {
+                "id": str(user.id),
+                "username": user.username,
+                "firstname": user.firstname,
+                "lastname": user.lastname
+            }
+        else:
+            user_data = {
+                "id": "Unknown",
+                "username": "Unknown",
+                "firstname": "Unknown",
+                "lastname": "Unknown"
+            }
+        
         # Prepare question data for the feed
         question_data = {
             "question_id": str(question.id),
-            "user": {
-                "id": str(user.id),
-                "username": "Sheldon",
-                "firstname": "Godwin",
-                "lastname": "Uwen",
-            },
-            "title": "Programming Language",
-            "content": "I love python programming language?",
+            "user": user_data,
+            "title": question.title,
+            "content": question.content,
             "created_at": question.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             "isActive": question.isActive
         }

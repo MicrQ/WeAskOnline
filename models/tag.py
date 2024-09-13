@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """ Tag model implementation """
-from models.base import Base, db
+from models.base import db
 
 
-class Tag(Base):
+class Tag(db.Model):
     """ Tag model """
     __tablename__ = 'tags'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     name = db.Column(db.String(256), nullable=False, unique=True)
 
     def __init__(self, name):
         """ Tag Initializer """
-        self.name = name
+        self.name = name.lower()

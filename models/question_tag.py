@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """ QuestionTag model implementation """
-from models.base import Base, db
+from models.base import db
 from models.question import Question
 from models.tag import Tag
 
 
-class QuestionTag(Base):
+class QuestionTag(db.Model):
     """ QuestionTag Model """
     __tablename__ = 'question_tags'
 
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     question_id = db.Column(db.String(256),
-                            db.ForeignKey('questions.id'), primary_key=True)
+                            db.ForeignKey('questions.id', ondelete='CASCADE'),
+                            nullable=False)
     tag_id = db.Column(db.String(256),
-                       db.ForeignKey('tags.id'), primary_key=True)
+                       db.ForeignKey('tags.id', ondelete='CASCADE'),
+                       nullable=False)
 
     question = db.relationship('Question',
                                backref=db.backref(

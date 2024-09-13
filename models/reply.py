@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """ Replay model definition """
-from models.base import Base, db
+from models.base import db
 from models.comment import Comment
 from models.user import User
 
 
-class Reply(Base):
+class Reply(db.Model):
     """ Base Model """
     __tablename__ = 'replies'
+
+    id = db.Column(db.Integer, primary_key=True,
+                   autoincrement=True, nullable=False)
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isEdited = db.Column(db.Boolean, nullable=False, default=False)
@@ -22,10 +25,9 @@ class Reply(Base):
                               backref=db.backref('replies', lazy=True))
 
     def __init__(self, body, created_at,
-                 isEdited, user_id, comment_id):
+                 user_id, comment_id):
         """ Reply model initializer """
         self.body = body
         self.created_at = created_at
         self.user_id = user_id
         self.comment_id = comment_id
-        self.isEdited = isEdited
