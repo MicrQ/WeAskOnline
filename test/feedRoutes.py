@@ -21,11 +21,14 @@ class FeedRoutesTestCase(unittest.TestCase):
         response = self.client.get('/feeds')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'feeds', response.data)
-
     def test_post_feed(self):
         response = self.client.post('/feeds', json={'title': 'Test Feed', 'content': 'This is a test feed.'})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'feed created', response.data)
+    def test_post_feed_invalid(self):
+        response = self.client.post('/feeds', json={'title': '', 'content': ''})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Invalid input', response.data)
 
 if __name__ == '__main__':
     unittest.main()

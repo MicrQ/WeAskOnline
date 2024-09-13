@@ -26,5 +26,10 @@ class QuestionRoutesTestCase(unittest.TestCase):
         response = self.client.post('/questions', json={'title': 'Test Question', 'body': 'This is a test question.'})
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'question created', response.data)
+
+    def test_post_question_invalid(self):
+        response = self.client.post('/questions', json={'title': '', 'body': ''})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Invalid input', response.data)
 if __name__ == '__main__':
     unittest.main()

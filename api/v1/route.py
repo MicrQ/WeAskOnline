@@ -1,14 +1,25 @@
 from flask import Blueprint
-from api.V1.userRoutes import user_routes
-from api.V1.questionRoutes import question_routes
-from api.V1.tagRoutes import tag_routes
-from api.V1.feedRoutes import feed_routes
+from api.v1.userRoutes import user_routes
+from api.v1.questionRoutes import question_routes
+from api.v1.tagRoutes import tag_routes
+from api.v1.feedRoutes import feed_routes
 
-# Initialize blueprint
-api_v1 = Blueprint('api_v1', __name__)
+home = Blueprint('home', __name__)
 
-# Register all routes with their respective URL prefixes
-api_v1.register_blueprint(user_routes, url_prefix='/users')
-api_v1.register_blueprint(question_routes, url_prefix='/questions')
-api_v1.register_blueprint(tag_routes, url_prefix='/tags')
-api_v1.register_blueprint(feed_routes, url_prefix='/feed')
+@home.route('/api/v1/')
+def index():
+    """\
+    Root directory and first page for the developer to find
+    moveable routes which route to find resources and to develop the frontend
+    
+    Returns:
+        JSON List[Dict] - list of keys and values (hyperlinks) 
+    """
+    home_data = [
+        {"message": "Hello, developer!"},
+        {"login": "http://localhost:5000/api/v1/login"},
+        {"register": "http://localhost:5000/api/register"},
+        {"password_reset": "http://localhost:5000/api/password-reset"},
+        {"user": "http://localhost:5000/api/users/<userid>"}
+    ]
+    return jsonify(home_data), 200
