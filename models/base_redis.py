@@ -17,8 +17,8 @@ USERNAME = os.getenv('USERNAME')
 
 class RedisServer():
     def __init__(self):
-        # self.redis_client = redis.Redis(HOST, PORT, password=PASSWORD, username=USERNAME)
         try:
+            # self.redis_client = redis.Redis(HOST, PORT, password=PASSWORD, username=USERNAME)
             self.redis_client = redis.Redis()
         except Exception as e:
             print({"error": e})
@@ -31,12 +31,20 @@ class RedisServer():
     
     def set(self, key: str, value: str):
         if not key or not value:
-            return "key or value is missing"
-        self.redis_client.set(key, value, timedelta(minutes=5.0))
+            print("key or value is missing")
+            return False
+        self.redis_client.set(key, value, timedelta(hours=5.0))
+        return True
+    
+    def set_token(self, key: str, value: str):
+        if not key or not value:
+            print("key or value is missing")
+            return False
+        self.redis_client.set(key, value, timedelta(days=2.0))
         return True
     
     def hset(self, user_email, token, user_data):
-        if not user_data or not user_data:
+        if not user_data or not user_email:
             return False
         self.redis_client.hset(user_email, mapping=user_data)
         self.redis_client.hset(user_email, "token", token)
