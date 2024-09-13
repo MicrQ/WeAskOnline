@@ -18,7 +18,7 @@ def send_token(email: str = None):
 
     try:
         for i in range(2):
-            otp += str(random.randint(10809, 99999))
+            otp = str(random.randint(10809, 99999))
 
         # provision the server and its host for sending email with SSL
         context = ssl.create_default_context()
@@ -37,18 +37,20 @@ def send_token(email: str = None):
 
         server.sendmail(EMAIL_ADDRESS, RECIEVER_EMAIL, msg.as_string())
         print('Email sent')
+        return otp
 
         # otp verification
     except Exception as e:
         print("Email not sent")
         print({'error': 'Network error'}, e)
+        return False
 
 def verify_token(token: int, user_token: int) -> bool:
     """
     Used to verify token sent to users email and check if the OTP passed is
     Valid"""
-    if not user_token:
-        return jsonify({"error": "Please, provide OTP"}), 400
+    if not user_token or not isinstance(user_token, int):
+        return jsonify({"error": "Please, provide valid OTP"}), 400
     if token == user_token:
         return True
     else:
