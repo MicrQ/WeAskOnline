@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-from crypt import methods
-from datetime import datetime, timezone
-import json
+from base64 import b64decode, b64encode
+from datetime import datetime
 from os import name
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, Response, jsonify, make_response, request
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from models.base import db
+from models.base_redis import RedisServer
 from models.country import Country
 from models.user import User
+from utils.email_controller import send_token, verify_token
 
 
 auth = Blueprint('auth', __name__)
@@ -56,28 +57,31 @@ def register():
         <Response 201> and redirects to the login page to confirm success
     """
     try:
-        username: str = request.form.get("username").replace(" ", "").lower()
+        username: str = request.form.get("username").strip().lower()
         password: str = request.form.get("password")
-        email: str = request.form.get("email").lower()
-        first_name: str = request.form.get("firstname").lower()
-        last_name: str = request.form.get("lastname").lower()
-        country: str = request.form.get("country").lower()
+        email: str = request.form.get("email").strip().lower()
+        first_name: str = request.form.get("firstname").strip().lower()
+        last_name: str = request.form.get("lastname").strip().lower()
+        country: str = request.form.get("country").strip().title()
 
         if not username:
             return jsonify({"error": "Missing username"}), 400
-        elif not password:
+        if not password:
             return jsonify({"error": "Missing password"}), 400
-        elif not email:
+        if not email:
             return jsonify({"error": "Missing email address"}), 400
-        elif not first_name:
+        if not first_name:
             return jsonify({"error": "Missing first name"}), 400
-        elif not last_name:
+        if not last_name:
             return jsonify({"error": "Missing last name"}), 400
-        elif not country:
+        if not country:
             return jsonify({"error": "Missing country"}), 400
 
-        FORMAT: str = "%Y-%m-%d %H:%M:%S"
-        country_id = "2"
+        # Inputing user's data into database
+        country_id = db.session.query(Country).filter_by(name=country).first()
+        print(country_id)
+        
+        # Create user instance 
         user_data: dict = {}
         user_data['username'] = username
         user_data['bio'] = ''
@@ -85,20 +89,82 @@ def register():
         user_data['lastname'] = last_name
         user_data['password'] = generate_password_hash(password)
         user_data['email'] = email
-        user_data['country_id'] = 1
-        user_data['created_at'] = datetime.now()
-        user_data['updated_at'] = datetime.now()
-        user = User(**user_data)
-        db.session.add(user)
-        db.session.commit()
+        user_data['country_id'] = country_id.id
+
+        # Send OTP to user email for verification
+        OTP = send_token(email)
+
+        r = RedisServer()
+        res = r.hset(email, OTP, user_data)
+        if not res:
+            return jsonify({'error': 'email not sent'}), 400
+        
+        encoded_email = b64encode(bytes(email.encode())).decode()
+
         return jsonify({
             "message": "Success,user created. Please verifiy your email",
             "data": user_data,
-            "link": "http://localhost:5000/login"
+            "link": f"http://localhost:5000/api/v1/verify-email?key={encoded_email}"
             }), 201
     except Exception as e:
-        print(e)
-        return jsonify({"error": "Server error, empty data found"}), 500
+        print(f"Error: {e}", exc_info=True)
+        return jsonify(
+            {"error": "Server error, empty data found"}
+            ), 500
+
+
+@auth.route('/api/v1/verify-email', methods=['POST'])
+def verify_email():
+    """
+    Route for handling and processing email
+    """
+    # Fetch data from redis
+    # Validate the user token from redis and create the user in the database
+    if request.args:
+        get_key: str = request.args.get("key")
+        decoded: bytes = get_key.encode()
+        email_key: str = b64decode(decoded).decode()
+    else:
+        email_key: str = request.form.get("email")
+    user_otp = request.form.get("otp")
+
+    if not email_key:
+        return jsonify({"error": "Missing email address"}), 400
+    
+    # Check & validate if the user's OTP is an int
+    try:
+        if not user_otp or not isinstance(int(user_otp), int):
+            return jsonify({"error": "Please, provide valid OTP"}), 400
+    except ValueError:
+        print("user provided a non integer parameter")
+        return jsonify({"error": "Please, provide valid OTP"}), 400
+    
+    
+    # Connect to redis and fetch token
+    redis_otp = RedisServer()
+    user_data = redis_otp.hgetall(email_key)
+    
+    # Convert dict[byte(str)] to dict[string] & add created date
+    user_data = {k.decode(): v.decode() for k, v in user_data.items()}
+    user_data['created_at'] = datetime.now()
+    user_data['updated_at'] = datetime.now()
+    print(user_data)
+    print(type(user_data))
+    
+    otp = user_data.get('token')
+
+    # validate token
+    if not otp:
+        return jsonify({'error': 'token expired or invalid'}), 401
+    result = verify_token(int(user_otp), int(otp))
+    if result:
+        del user_data['token']
+        user = User(**user_data)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({'message': 'success, email verified'}), 200
+    else:
+        return jsonify({'error': 'email not verified'}), 401
 
 
 @auth.route('/api/v1/logout', methods=['GET'])
@@ -118,11 +184,13 @@ def reset_password():
     route for handling password reset for users that has forgotten their password
     and also checks if the email is stored in the database
     """
+    # check if the user is logged in before fetching the data or the access token or if token is valid
+    # Retrieve the token from the redis server and send the OTP to the 
     data = request.get_json()
-    password: str = str(data['password'])
-    if not data['email']:
+    password: str = str(data.get('password'))
+    if not data.get('email'):
         return jsonify({"error": "Please provide email address"}), 400
-    if not data['password']:
+    if not password:
         return jsonify({"error": "provide password"}), 400
     try:
         user_email = db.session.query(User).filter_by(email=data['email']).first()
