@@ -40,6 +40,15 @@ def login():
     if check_password_hash(user.password, password):
         # store the token on the user cookie with key & token as value
         token: str = str(uuid4())
+
+        redisConnect = RedisServer()
+        resp = redisConnect.set(token, username)
+        
+        # Check if token was stored in redis server
+        if not resp:
+            return jsonify({"error": "Couldn't  connect to server"}), 
+        
+        # Store the token in the cookie session
         res = jsonify({"message": "Success", "api-token": token})
         res.set_cookie('api-token', token, max_age=60 * 60 * 24)
         return res, 200
