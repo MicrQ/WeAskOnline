@@ -39,6 +39,9 @@ def login():
         return jsonify({"error": "Invalid username"}), 400
     if check_password_hash(user.password, password):
         # store the token on the user cookie with key & token as value
+        if not user.IsActive:
+            return jsonify({"error": "User account is inactive"}), 403
+
         token: str = str(uuid4())
 
         redisConnect = RedisServer()
@@ -102,6 +105,8 @@ def register():
 
         # Send OTP to user email for verification
         OTP = send_token(email)
+        if not OTP:
+            return jsonify({'error': 'email not valid'}), 400
 
         r = RedisServer()
         res = r.hset(email, OTP, user_data)
