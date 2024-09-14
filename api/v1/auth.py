@@ -4,14 +4,13 @@ from flask import Blueprint, jsonify, request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
 from base64 import b64decode, b64encode
-
-from models.base import db
-from models.base_redis import RedisServer
+from models import db, User
 from models.country import Country
-from models.user import User
 from utils.email_controller import send_token, verify_token
+from redis_server import RedisServer
 
 auth = Blueprint('auth', __name__)
+
 
 @auth.route('/api/v1/login', methods=['POST'])
 def login():
@@ -32,10 +31,21 @@ def login():
     if user is None:
         return jsonify({"error": "Invalid username"}), 400
     if check_password_hash(user.password, password):
-        # store the token on the user cookie with key & token as value
-        token: str = str(uuid4())
+        if not user.isActive:
+            return jsonify({"error": "User account is inactive"}), 403
+
+        token = str(uuid4())
+
+        redisConnect = RedisServer()
+        resp = redisConnect.set_token(token, username)
+
+        # Check if token was stored in Redis server
+        if not resp:
+            return jsonify({"error": "Couldn't connect to Redis server"}), 500
+
+        # Store the token in the cookie session & expire age at 5 days
         res = jsonify({"message": "Success", "api-token": token})
-        res.set_cookie('api-token', token, max_age=60 * 60 * 24)
+        res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
         return res, 200
     else:
         return jsonify({"error": "Incorrect password"})
@@ -58,7 +68,9 @@ def register():
         last_name = request.form.get("lastname").strip().lower()
         country = request.form.get("country").strip().title()
 
-        if not all([username, password, email, first_name, last_name, country]):
+        if not all([
+            username, password, email, first_name, last_name, country
+        ]):
             return jsonify({"error": "Missing required fields"}), 400
 
         # Check if country exists in the database
@@ -86,17 +98,21 @@ def register():
         res = r.hset(email, OTP, user_data)
         if not res:
             return jsonify({'error': 'Email not sent'}), 400
-        
+
         encoded_email = b64encode(email.encode()).decode()
 
         return jsonify({
             "message": "User created successfully. Please verify your email.",
             "data": user_data,
-            "link": f"http://localhost:5000/api/v1/verify-email?key={encoded_email}"
+            "link": (
+               f"http://localhost:5000/api/v1/verify-email?key={encoded_email}"
+            )
         }), 201
+
     except Exception as e:
         print(f"Error: {e}", exc_info=True)
         return jsonify({"error": "Server error, empty data found"}), 500
+
 
 @auth.route('/api/v1/verify-email', methods=['POST'])
 def verify_email():
@@ -110,12 +126,13 @@ def verify_email():
         email_key = decoded
     else:
         email_key = request.form.get("email")
-    
+
     user_otp = request.form.get("otp")
 
     if not email_key:
         return jsonify({"error": "Missing email address"}), 400
-    
+
+    # Check & validate if the user's OTP is an int
     try:
         if not user_otp or not isinstance(int(user_otp), int):
             return jsonify({"error": "Please, provide valid OTP"}), 400
@@ -126,18 +143,18 @@ def verify_email():
     # Connect to redis and fetch token
     redis_otp = RedisServer()
     user_data = redis_otp.hgetall(email_key)
-    
+
     # Convert dict[byte(str)] to dict[string] & add created date
     user_data = {k.decode(): v.decode() for k, v in user_data.items()}
     user_data['created_at'] = datetime.now()
     user_data['updated_at'] = datetime.now()
-    
+
     otp = user_data.get('token')
 
     # Validate token
     if not otp:
         return jsonify({'error': 'Token expired or invalid'}), 401
-    
+
     result = verify_token(int(user_otp), int(otp))
     if result:
         del user_data['token']
@@ -147,6 +164,7 @@ def verify_email():
         return jsonify({'message': 'Success, email verified'}), 200
     else:
         return jsonify({'error': 'Email not verified'}), 401
+
 
 @auth.route('/api/v1/logout', methods=['GET'])
 def logout():
@@ -158,10 +176,12 @@ def logout():
     res.delete_cookie('api-token')
     return res, 204
 
+
 @auth.route('/api/v1/reset-password', methods=["POST"])
 def reset_password():
     """
-    Route for handling password reset for users that have forgotten their password
+    Route for handling password reset for users that
+    have forgotten their password
     and also checks if the email is stored in the database
     """
     data = request.get_json()
@@ -183,4 +203,4 @@ def reset_password():
         return jsonify({"message": "Success, password changed"}), 201
     except Exception as e:
         print(e)
-        return jsonify({"error": "Server error"}), 500
+        return jsonify({"error": str(e)}), 500

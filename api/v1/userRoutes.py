@@ -1,70 +1,62 @@
-from flask import Blueprint, jsonify, request
-from models import User, db
-from uuid import UUID
-from sqlalchemy.exc import SQLAlchemyError
+#!/usr/bin/env python3
+from flask import Blueprint, request, jsonify
+from models.user import User
+from models.base import db
+from werkzeug.security import generate_password_hash
 
 user_routes = Blueprint('user_routes', __name__)
 
-# Route: User Dashboard
-@user_routes.route('/dashboard', methods=['GET'])
-def dashboard():
-    return jsonify({"message": "User dashboard"}), 200
 
-# Route: Get current user details
-@user_routes.route('/users/me', methods=['GET'])
-def get_current_user():
-    user_id = request.args.get('user_id')
-    try:
-        user = User.query.get(user_id)
-        if user:
-            user_data = {
-                "id": str(user.id),
-                "firstname": user.firstname,
-                "lastname": user.lastname,
-                "username": user.username,
-                "email": user.email,
-                "bio": user.bio,
-                "country_id": user.country_id,
-                "profile_image": user.profile_image,
-                "created_at": user.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-                "updated_at": user.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
-                "isActive": user.isActive
-            }
-            return jsonify({"user": user_data}), 200
-        return jsonify({"error": "User not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# Route: Update user by ID
-@user_routes.route('/users/<uuid:user_id>', methods=['POST'])
-def update_user(user_id):
-    if not request.is_json:
-        return jsonify({"error": "Invalid request format, JSON expected"}), 400
-    
+@user_routes.route('/users', methods=['POST'])
+def create_user():
+    """Create a new user"""
     data = request.get_json()
-    try:
-        user = User.query.get(user_id)
-        if user:
-            for key, value in data.items():
-                if hasattr(user, key):
-                    setattr(user, key, value)
-            db.session.commit()
-            return jsonify({"message": f"User {user_id} updated", "data": data}), 200
-        return jsonify({"error": "User not found"}), 404
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+    required_fields = [
+        'firstname', 'lastname', 'username', 'email', 'password'
+        ]
 
-# Route: Delete user account
-@user_routes.route('/users/<uuid:user_id>/delete_account', methods=['POST'])
-def delete_user_account(user_id):
-    try:
-        user = User.query.get(user_id)
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            return jsonify({"message": f"User {user_id} account deleted"}), 200
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    if User.query.filter_by(email=data['email']).first() is not None:
+        return jsonify({"error": "Email already exists"}), 400
+
+    if User.query.filter_by(username=data['username']).first() is not None:
+        return jsonify({"error": "Username already exists"}), 400
+
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+
+    new_user = User(
+        firstname=data['firstname'],
+        lastname=data['lastname'],
+        username=data['username'],
+        email=data['email'],
+        password=hashed_password,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({"message": "User created successfully"}), 201
+
+
+@user_routes.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    """Retrieve a user by ID"""
+    user = User.query.get(user_id)
+
+    if user is None:
         return jsonify({"error": "User not found"}), 404
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+
+    return jsonify({
+        "id": user.id,
+        "firstname": user.firstname,
+        "lastname": user.lastname,
+        "username": user.username,
+        "email": user.email,
+        "bio": user.bio,
+        "created_at": user.created_at.isoformat(),
+        "updated_at": user.updated_at.isoformat(),
+    }), 200

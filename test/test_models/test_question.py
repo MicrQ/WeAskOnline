@@ -62,8 +62,7 @@ class testQuestionModel(unittest.TestCase):
             title="What is python",
             body="I want someone to tell me what python is.",
             user_id=user.id,
-            created_at=now,
-            updated_at=now,
+            updated_at=now
         )
 
         db.session.add(new_question)
@@ -79,8 +78,7 @@ class testQuestionModel(unittest.TestCase):
             title="What is python",
             body="I want someone to tell me what python is.",
             user_id=-1,
-            created_at=now,
-            updated_at=now,
+            updated_at=now
         )
 
         db.session.add(new_question)

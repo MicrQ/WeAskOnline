@@ -26,7 +26,7 @@ def get_feed():
     for question in recent_questions:
         # Retrieve user who posted the question
         user = User.query.get(question.user_id)
-        
+
         # Check if user exists
         if user:
             user_data = {
@@ -42,7 +42,7 @@ def get_feed():
                 "firstname": "Unknown",
                 "lastname": "Unknown"
             }
-        
+
         # Prepare question data for the feed
         question_data = {
             "question_id": str(question.id),

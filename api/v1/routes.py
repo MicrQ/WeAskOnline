@@ -3,17 +3,19 @@ from api.v1.userRoutes import user_routes
 from api.v1.questionRoutes import question_routes
 from api.v1.tagRoutes import tag_routes
 from api.v1.feedRoutes import feed_routes
+from models.user import User
 
 home = Blueprint('home', __name__)
+
 
 @home.route('/api/v1/')
 def index():
     """\
     Root directory and first page for the developer to find
     moveable routes which route to find resources and to develop the frontend
-    
+
     Returns:
-        JSON List[Dict] - list of keys and values (hyperlinks) 
+        JSON List[Dict] - list of keys and values (hyperlinks)
     """
     home_data = [
         {"message": "Hello, developer!"},
