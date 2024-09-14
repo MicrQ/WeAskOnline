@@ -152,3 +152,26 @@ def get_questions():
             else:
                 question['downvotes'] += 1
     return jsonify(questions), 200
+
+
+@question.route('/api/v1/questions/<int:id>', methods=['GET'])
+def get_question(id):
+    """ endpoint used to get a single question """
+    question = db.session.query(Question).filter_by(id=id).first()
+    if not question:
+        abort(404)
+    question = question.to_dict()
+    question['comments'] = db.session.query(Comment).filter_by(
+        question_id=question['id']).all()
+    votes = db.session.query(Vote).filter_by(
+        parent_id=question['id'], parent_type='question').all()
+
+    # count upvotes(isUpvote=True) and downvotes(isUpvote=False)
+    question['upvotes'] = 0
+    question['downvotes'] = 0
+    for vote in votes:
+        if vote.isUpvote:
+            question['upvotes'] += 1
+        else:
+            question['downvotes'] += 1
+    return jsonify(question), 200
