@@ -131,8 +131,8 @@ def update_question(id):
 @question.route('/api/v1/questions', methods=['GET'])
 def get_questions():
     """ endpoint used to get all questions """
-    questions = db.session.query(Question).order_by(
-        Question.created_at.desc()).all()
+    questions = db.session.query(Question).filter_by(
+        isActive=True).order_by(Question.created_at.desc()).all()
     # convert to dictionary
     questions = [question.to_dict() for question in questions]
     # add number of comment for each question
@@ -158,7 +158,7 @@ def get_questions():
 def get_question(id):
     """ endpoint used to get a single question """
     question = db.session.query(Question).filter_by(id=id).first()
-    if not question:
+    if not question or not question.isActive:
         abort(404)
     question = question.to_dict()
     question['comments'] = db.session.query(Comment).filter_by(
