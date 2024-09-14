@@ -39,18 +39,18 @@ def login():
         return jsonify({"error": "Invalid username"}), 400
     if check_password_hash(user.password, password):
         # store the token on the user cookie with key & token as value
-        if not user.IsActive:
+        if not user.isActive:
             return jsonify({"error": "User account is inactive"}), 403
 
         token: str = str(uuid4())
 
         redisConnect = RedisServer()
         resp = redisConnect.set_token(token, username)
-        
+
         # Check if token was stored in redis server
         if not resp:
             return jsonify({"error": "Couldn't  connect to Redis server"}), 500
-        
+
         # Store the token in the cookie session & expire age at 5 days
         res = jsonify({"message": "Success", "api-token": token})
         res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
@@ -92,8 +92,8 @@ def register():
         # Inputing user's data into database
         country_id = db.session.query(Country).filter_by(name=country).first()
         print(country_id)
-        
-        # Create user instance 
+
+        # Create user instance
         user_data: dict = {}
         user_data['username'] = username
         user_data['bio'] = ''
@@ -112,7 +112,7 @@ def register():
         res = r.hset(email, OTP, user_data)
         if not res:
             return jsonify({'error': 'email not sent'}), 400
-        
+
         encoded_email = b64encode(bytes(email.encode())).decode()
 
         return jsonify({
@@ -144,7 +144,7 @@ def verify_email():
 
     if not email_key:
         return jsonify({"error": "Missing email address"}), 400
-    
+
     # Check & validate if the user's OTP is an int
     try:
         if not user_otp or not isinstance(int(user_otp), int):
@@ -152,12 +152,11 @@ def verify_email():
     except ValueError:
         print("user provided a non integer parameter")
         return jsonify({"error": "Please, provide valid OTP"}), 400
-    
-    
+
     # Connect to redis and fetch token
     redis_otp = RedisServer()
     user_data = redis_otp.hgetall(email_key)
-    
+
     # Convert dict[byte(str)] to dict[string] & add created date
     user_data = {k.decode(): v.decode() for k, v in user_data.items()}
     user_data['created_at'] = datetime.now()
@@ -193,11 +192,13 @@ def logout():
 @auth.route('/api/v1/reset-password', methods=["POST"])
 def reset_password():
     """\
-    route for handling password reset for users that has forgotten their password
+    route for handling password reset for users that has
+    forgotten their password
     and also checks if the email is stored in the database
     """
-    # check if the user is logged in before fetching the data or the access token or if token is valid
-    # Retrieve the token from the redis server and send the OTP to the 
+    # check if the user is logged in before fetching
+    # the data or the access token or if token is valid
+    # Retrieve the token from the redis server and send the OTP to the
     data = request.get_json()
     password: str = str(data.get('password'))
     if not data.get('email'):
@@ -205,7 +206,8 @@ def reset_password():
     if not password:
         return jsonify({"error": "provide password"}), 400
     try:
-        user_email = db.session.query(User).filter_by(email=data['email']).first()
+        user_email = db.session.query(User).filter_by(
+            email=data['email']).first()
         user_email.password = generate_password_hash(password)
         db.session.commit()
         db.session.close()
@@ -213,4 +215,3 @@ def reset_password():
     except Exception as e:
         print(e)
         return jsonify({"error": e}), 500
-    

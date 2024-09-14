@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """ Question model definition """
+from email.policy import default
 from models.user import User
 from models.base import db
+from datetime import datetime, timezone
 
 
 class Question(db.Model):
@@ -12,8 +14,12 @@ class Question(db.Model):
                    autoincrement=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     body = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
-    updated_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime,
+                           default=datetime.now(timezone.utc),
+                           nullable=False)
+    updated_at = db.Column(db.DateTime,
+                           default=datetime.now(timezone.utc),
+                           nullable=False)
     isActive = db.Column(db.Boolean, nullable=False, default=True)
 
     user_id = db.Column(db.String(256),
@@ -23,11 +29,21 @@ class Question(db.Model):
                            backref=db.backref('questions', lazy=True))
 
     def __init__(self, title, body,
-                 user_id, created_at,
-                 updated_at):
+                 user_id, updated_at=None):
         """ Question Initializer """
-        self.title = title
-        self.body = body
+        self.title = title.title()
+        self.body = body.title()
         self.user_id = user_id
-        self.created_at = created_at
-        self.updated_at = updated_at
+        if updated_at:
+            self.updated_at = updated_at
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'user_id': self.user_id
+        }

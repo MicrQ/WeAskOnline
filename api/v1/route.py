@@ -9,9 +9,9 @@ def index():
     """\
     Root directory and first page for the developer to find
     moveable routes which route to find resources and to develop the frontend
-    
+
     Returns:
-        JSON List[Dict] - list of keys and values (hyperlinks) 
+        JSON List[Dict] - list of keys and values (hyperlinks)
     """
     home_data = [
         {"message": "Hello, developer!"},
