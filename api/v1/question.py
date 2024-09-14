@@ -1,12 +1,15 @@
 """ Question endpoints """
+from crypt import methods
 from os import abort
 from flask import Blueprint, request, jsonify, redirect, abort
+from models.comment import Comment
 from models.base import db
 from models.base_redis import RedisServer
 from models.question import Question
 from models.tag import Tag
 from models.user import User
 from models.question_tag import QuestionTag
+from models.vote import Vote
 from datetime import datetime, timezone
 
 
@@ -123,3 +126,29 @@ def update_question(id):
             db.session.commit()
 
     return jsonify({'message': 'Question updated'}), 200
+
+
+@question.route('/api/v1/questions', methods=['GET'])
+def get_questions():
+    """ endpoint used to get all questions """
+    questions = db.session.query(Question).order_by(
+        Question.created_at.desc()).all()
+    # convert to dictionary
+    questions = [question.to_dict() for question in questions]
+    # add number of comment for each question
+    # and number of votes
+    for question in questions:
+        question['comments'] = db.session.query(Comment).filter_by(
+            question_id=question['id']).count()
+        votes = db.session.query(Vote).filter_by(
+            parent_id=question['id'], parent_type='question').all()
+
+        # count upvotes(isUpvote=True) and downvotes(isUpvote=False)
+        question['upvotes'] = 0
+        question['downvotes'] = 0
+        for vote in votes:
+            if vote.isUpvote:
+                question['upvotes'] += 1
+            else:
+                question['downvotes'] += 1
+    return jsonify(questions), 200

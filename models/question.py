@@ -36,3 +36,14 @@ class Question(db.Model):
         self.user_id = user_id
         if updated_at:
             self.updated_at = updated_at
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'user_id': self.user_id
+        }
