@@ -39,7 +39,6 @@ def create_question():
     if not body:
         return jsonify({'Error': 'Missing body'}), 400
 
-    now = datetime.now(timezone.utc)
     question = Question(
         title=title,
         body=body,
@@ -65,6 +64,62 @@ def create_question():
     return jsonify({'message': 'Question created'}), 201
 
 
-# @question.route('api/v1/questions/<int:id>')
-# def update_question(id):
-#     """ endpoint used to  """
+@question.route('/api/v1/questions/<int:id>', methods=['PUT'])
+def update_question(id):
+    """ endpoint used to update a question """
+    token = request.cookies.get('api-token')
+    if not token:
+        abort(401)
+
+    redis = RedisServer()
+    username = redis.get(token)
+    if username is None:
+        abort(401)
+
+    user = db.session.query(User).filter_by(
+        username=username.decode('utf-8')).first()
+    if not user:
+        abort(401)
+
+    question = db.session.query(Question).filter_by(id=id).first()
+    if not question or not question.isActive:
+        abort(404)
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'Error': 'Invalid JSON data'}), 400
+    title = data.get('title')
+    if not title:
+        return jsonify({'Error': 'Missing title'}), 400
+    body = data.get('body')
+    if not body:
+        return jsonify({'Error': 'Missing body'}), 400
+
+    question.title = title
+    question.body = body
+    question.updated_at = datetime.now(timezone.utc)
+    db.session.commit()
+
+    # removing all existing tags
+    old_tags = db.session.query(QuestionTag).filter_by(
+        question_id=question.id).all()
+    for tag in old_tags:
+        db.session.delete(tag)
+        db.session.commit()
+
+    tags = data.get('tags')
+    if tags:
+        for tag in tags:
+            tag_exists = db.session.query(Tag).filter_by(
+                name=tag.lower()).first()
+            new_tag = Tag(tag)
+            if not tag_exists:
+                db.session.add(new_tag)
+                db.session.commit()
+            new_tag = db.session.query(Tag).filter_by(
+                name=new_tag.name).first()
+            question_tag = QuestionTag(question.id, new_tag.id)
+            db.session.add(question_tag)
+            db.session.commit()
+
+    return jsonify({'message': 'Question updated'}), 200
