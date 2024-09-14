@@ -4,8 +4,11 @@ import os
 import random
 import smtplib
 import ssl
+from dotenv import load_dotenv
 
 from flask import jsonify
+
+load_dotenv()
 
 # smpt_object = smtplib.SMTP('smpt.gmail.com', 587)
 
