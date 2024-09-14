@@ -91,7 +91,8 @@ def register():
 
         # Inputing user's data into database
         country_id = db.session.query(Country).filter_by(name=country).first()
-        print(country_id)
+        if not country_id:
+            return jsonify({"error": "Country not found"}), 400
 
         # Create user instance
         user_data: dict = {}
