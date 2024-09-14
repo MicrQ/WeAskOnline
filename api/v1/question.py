@@ -88,6 +88,11 @@ def update_question(id):
     if not question or not question.isActive:
         abort(404)
 
+    if int(question.user_id) != user.id:
+        return jsonify(
+            {'Error': 'You don\'t have permission to delete this question'}
+            ), 403
+
     data = request.get_json()
     if not data:
         return jsonify({'Error': 'Invalid JSON data'}), 400
@@ -175,3 +180,34 @@ def get_question(id):
         else:
             question['downvotes'] += 1
     return jsonify(question), 200
+
+
+@question.route('/api/v1/questions/<int:id>', methods=['DELETE'])
+def delete_question(id):
+    """ route used to delete/deactivate a question """
+    token = request.cookies.get('api-token')
+    if not token:
+        abort(401)
+
+    redis = RedisServer()
+    username = redis.get(token)
+    if username is None:
+        abort(401)
+
+    user = db.session.query(User).filter_by(
+        username=username.decode('utf-8')).first()
+    if not user:
+        abort(401)
+
+    question = db.session.query(Question).filter_by(id=id).first()
+    if not question or not question.isActive:
+        abort(404)
+
+    if int(question.user_id) != user.id:
+        return jsonify(
+            {'Error': 'You don\'t have permission to delete this question'}
+            ), 403
+
+    question.isActive = False
+    db.session.commit()
+    return jsonify({'message': 'Question deleted'}), 200
