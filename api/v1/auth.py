@@ -29,13 +29,17 @@ def login():
         return jsonify({"error": "Missing username or password"}), 400
 
     user = db.session.query(User).filter_by(username=username).first()
-    if not user or not check_password_hash(user.password, password):
-        return jsonify({"error": "Invalid credentials"}), 400
+    if user is None:
+        return jsonify({"error": "Invalid username"}), 400
+    if check_password_hash(user.password, password):
+        # store the token on the user cookie with key & token as value
+        token: str = str(uuid4())
+        res = jsonify({"message": "Success", "api-token": token})
+        res.set_cookie('api-token', token, max_age=60 * 60 * 24)
+        return res, 200
+    else:
+        return jsonify({"error": "Incorrect password"})
 
-    token = str(uuid4())
-    res = jsonify({"message": "Success", "api-token": token})
-    res.set_cookie('api-token', token, max_age=60 * 60 * 24)
-    return res, 200
 
 @auth.route('/api/v1/register', methods=['POST'])
 def register():
@@ -77,6 +81,7 @@ def register():
 
         # Send OTP to user email for verification
         OTP = send_token(email)
+
         r = RedisServer()
         res = r.hset(email, OTP, user_data)
         if not res:
