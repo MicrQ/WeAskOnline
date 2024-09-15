@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ flask app """
 from flask import Flask
+from api.v1 import comment
 from api.v1.auth import auth
 from models.base import db
 from api.v1.route import home
@@ -19,6 +20,7 @@ db.init_app(app)
 app.register_blueprint(auth)
 app.register_blueprint(home)
 app.register_blueprint(question)
+app.register_blueprint(comment)
 
 with app.app_context():
     if onDevelopment:
