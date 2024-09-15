@@ -91,7 +91,8 @@ def register():
 
         # Inputing user's data into database
         country_id = db.session.query(Country).filter_by(name=country).first()
-        print(country_id)
+        if not country_id:
+            return jsonify({"error": "Country not found"}), 400
 
         # Create user instance
         user_data: dict = {}
@@ -161,9 +162,7 @@ def verify_email():
     user_data = {k.decode(): v.decode() for k, v in user_data.items()}
     user_data['created_at'] = datetime.now()
     user_data['updated_at'] = datetime.now()
-    print(user_data)
-    print(type(user_data))
-
+    
     otp = user_data.get('token')
 
     # validate token
