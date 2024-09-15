@@ -12,7 +12,8 @@ from models.user import User
 comment = Blueprint('comment', __name__)
 
 
-@comment.route('/questions/<int:id>/comments/<int:comment_id', methods=['PUT'])
+@comment.route('/api/v1/questions/<int:id>/comments/<int:comment_id>',
+               methods=['PUT'])
 def update_comment(id, comment_id):
     """ Updates existing comment data """
     token = request.cookies.get('api-token')
@@ -50,7 +51,8 @@ def update_comment(id, comment_id):
 
 
 # DELETE - /questions/<id>/comments/<id>
-@comment.route('/questions/<int:id>/comments/<int:comment_id>', methods="DELETE")
+@comment.route('/api/v1/questions/<int:id>/comments/<int:comment_id>',
+               methods="DELETE")
 def delete_comment(id, comment_id):
     """ Deletes the comment based on the id of the comment and if the comment
     and if the comment is being posted by the owner of the comment """
