@@ -1,7 +1,7 @@
 """ Question endpoints """
 from crypt import methods
 from os import abort
-from flask import Blueprint, request, jsonify, redirect, abort
+from flask import Blueprint, request, jsonify, redirect, abort, url_for
 from models.comment import Comment
 from models.base import db
 from models.base_redis import RedisServer
@@ -159,12 +159,20 @@ def get_questions():
     return jsonify(questions), 200
 
 
+@question.route('/api/v1/questions/<int:id>/<string:title>', methods=['GET'])
 @question.route('/api/v1/questions/<int:id>', methods=['GET'])
-def get_question(id):
+def get_question(id, title=None):
     """ endpoint used to get a single question """
     question = db.session.query(Question).filter_by(id=id).first()
     if not question or not question.isActive:
         abort(404)
+
+    # redirecting the user to the endpoint + title
+    route_title = question.title.lower().replace(" ", "-")
+    if not title or title != route_title:
+        return redirect(
+            f'/api/v1/questions/{id}/{route_title}')
+
     question = question.to_dict()
     comments = db.session.query(Comment).filter_by(
         question_id=question['id']).all()
@@ -213,3 +221,21 @@ def delete_question(id):
     question.isActive = False
     db.session.commit()
     return jsonify({'message': 'Question deleted'}), 200
+
+
+@question.route('/api/v1/questions/search', methods=['GET'])
+def search_questions():
+    """ route used to search questions """
+    keyword = request.args.get('q')
+    if not keyword:
+        return redirect(url_for('question.get_questions'))
+
+    questions = db.session.query(Question).filter(
+        Question.title.ilike(f'%{keyword}%')).all()
+
+    if not questions:
+        abort(404)
+
+    questions = [question.to_dict() for question in questions]
+
+    return jsonify(questions), 200
