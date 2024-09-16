@@ -159,12 +159,20 @@ def get_questions():
     return jsonify(questions), 200
 
 
+@question.route('/api/v1/questions/<int:id>/<string:title>', methods=['GET'])
 @question.route('/api/v1/questions/<int:id>', methods=['GET'])
-def get_question(id):
+def get_question(id, title=None):
     """ endpoint used to get a single question """
     question = db.session.query(Question).filter_by(id=id).first()
     if not question or not question.isActive:
         abort(404)
+
+    # redirecting the user to the endpoint + title
+    route_title = question.title.lower().replace(" ", "-")
+    if not title or title != route_title:
+        return redirect(
+            f'/api/v1/questions/{id}/{route_title}')
+
     question = question.to_dict()
     comments = db.session.query(Comment).filter_by(
         question_id=question['id']).all()
