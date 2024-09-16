@@ -54,6 +54,9 @@ def create_vote(entity, id):
     if not model:
         abort(404)
     
+    # Check if the user has an already existing vote, if true, then modify the
+    # vote with the new vote
+    
     check_user_vote = db.session.query(Vote).filter_by(
         parent_type=entity.lower(),
         parent_id=id,
@@ -68,8 +71,6 @@ def create_vote(entity, id):
             is_upvote=False,
             user_id=user.id, parent_type=entity.lower(),
             parent_id=id)
-        
-        # db.session.add(user_vote)
 
         if vote == 'upvote':
             user_vote.is_upvote = True
