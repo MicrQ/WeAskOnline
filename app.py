@@ -6,6 +6,7 @@ from api.v1.auth import auth
 from models.base import db
 from api.v1.route import home
 from api.v1.question import question
+from api.v1.comment import comment
 from sqlalchemy import text
 
 

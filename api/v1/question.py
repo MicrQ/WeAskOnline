@@ -166,8 +166,10 @@ def get_question(id):
     if not question or not question.isActive:
         abort(404)
     question = question.to_dict()
-    question['comments'] = db.session.query(Comment).filter_by(
+    comments = db.session.query(Comment).filter_by(
         question_id=question['id']).all()
+    question['comments'] = [comment.to_dict() for comment in comments]
+
     votes = db.session.query(Vote).filter_by(
         parent_id=question['id'], parent_type='question').all()
 
