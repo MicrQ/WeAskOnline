@@ -23,7 +23,7 @@ def create_reply(comment_id):
     redis = RedisServer()
     if not redis:
         return jsonify({'Error': 'Redis server not available'}), 500
-    
+
     username = redis.get(token)
     if username is None:
         abort(401)
