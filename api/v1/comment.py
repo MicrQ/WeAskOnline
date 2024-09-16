@@ -80,28 +80,31 @@ def delete_comment(id, comment_id):
         abort(401)
     try:
         user = db.session.query(User).filter_by(
-            name=username.decode()).first()
+            username=username.decode('utf-8')).first()
         if not user:
             abort(401)
         question = db.session.query(Question).filter_by(id=id).first()
         if not question:
             abort(404)
         comment = db.session.query(Comment).filter_by(
-            question_id=comment_id).first()
+            question_id=id, id=comment_id).first()
         if not comment:
             abort(404)
+        print("safe .......")
     except Exception as e:
         print("Error with fetching data from db: ", str(e))
         abort(404)
 
     # Check if the current user is the owner of the comment and have
     # access to delete the comment else abort 401
-    if comment.id == user.id:
+    if int(comment.user_id) == user.id:
         db.session.delete(comment)
         db.session.commit()
         return jsonify({'message': 'Success, comment deleted'}), 200
     else:
-        abort(401)
+        return jsonify(
+            {'Error': 'You don\'t have permission to delete this comment'}
+        ), 403
 
 
 @comment.route('/api/v1/questions/<int:id>/comments', methods=['POST'])
