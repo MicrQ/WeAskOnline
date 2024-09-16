@@ -10,6 +10,7 @@ from models.tag import Tag
 from models.user import User
 from models.question_tag import QuestionTag
 from models.vote import Vote
+from models.reply import Reply
 from datetime import datetime, timezone
 
 
@@ -177,6 +178,10 @@ def get_question(id, title=None):
     comments = db.session.query(Comment).filter_by(
         question_id=question['id']).all()
     question['comments'] = [comment.to_dict() for comment in comments]
+    for comment in question['comments']:
+        replies = db.session.query(Reply).filter_by(
+            comment_id=comment['id']).all()
+        comment['replies'] = [reply.to_dict() for reply in replies]
 
     votes = db.session.query(Vote).filter_by(
         parent_id=question['id'], parent_type='question').all()
