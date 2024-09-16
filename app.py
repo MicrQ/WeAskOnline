@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ flask app """
 from flask import Flask
-from api.v1 import vote
+from api.v1.vote import vote
 from api.v1.auth import auth
 from models.base import db
 from api.v1.route import home
