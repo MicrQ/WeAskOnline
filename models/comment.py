@@ -32,3 +32,14 @@ class Comment(db.Model):
         self.created_at = created_at
         self.user_id = user_id
         self.question_id = question_id
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'body': self.body,
+            'created_at': self.created_at,
+            'isEdited': self.isEdited,
+            'user_id': self.user_id,
+            'question_id': self.question_id
+        }
