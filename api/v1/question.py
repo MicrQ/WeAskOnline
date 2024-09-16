@@ -1,7 +1,7 @@
 """ Question endpoints """
 from crypt import methods
 from os import abort
-from flask import Blueprint, request, jsonify, redirect, abort
+from flask import Blueprint, request, jsonify, redirect, abort, url_for
 from models.comment import Comment
 from models.base import db
 from models.base_redis import RedisServer
@@ -221,3 +221,21 @@ def delete_question(id):
     question.isActive = False
     db.session.commit()
     return jsonify({'message': 'Question deleted'}), 200
+
+
+@question.route('/api/v1/questions/search', methods=['GET'])
+def search_questions():
+    """ route used to search questions """
+    keyword = request.args.get('q')
+    if not keyword:
+        return redirect(url_for('question.get_questions'))
+
+    questions = db.session.query(Question).filter(
+        Question.title.ilike(f'%{keyword}%')).all()
+
+    if not questions:
+        abort(404)
+
+    questions = [question.to_dict() for question in questions]
+
+    return jsonify(questions), 200
