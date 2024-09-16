@@ -28,8 +28,7 @@ def create_vote(entity, id):
     username = redis.get(token)
     if not username:
         abort(401)
-    
-    user = db.session.query(User).filter_by(username=username).first()
+    user = db.session.query(User).filter_by(username=username.decode('UTF-8')).first()
     if not user:
         abort(401)
 
@@ -59,4 +58,4 @@ def create_vote(entity, id):
         parent_id=id)
     db.session.add(user_vote)
     db.session.commit()
-    return jsonify({'message': 'Success'})
+    return jsonify({'message': 'Success'}), 200
