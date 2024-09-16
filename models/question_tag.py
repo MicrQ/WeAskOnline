@@ -11,10 +11,10 @@ class QuestionTag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, nullable=False)
-    question_id = db.Column(db.String(256),
+    question_id = db.Column(db.Integer,
                             db.ForeignKey('questions.id', ondelete='CASCADE'),
                             nullable=False)
-    tag_id = db.Column(db.String(256),
+    tag_id = db.Column(db.Integer,
                        db.ForeignKey('tags.id', ondelete='CASCADE'),
                        nullable=False)
 

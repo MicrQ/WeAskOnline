@@ -22,7 +22,7 @@ class Question(db.Model):
                            nullable=False)
     isActive = db.Column(db.Boolean, nullable=False, default=True)
 
-    user_id = db.Column(db.String(256),
+    user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
     user = db.relationship('User',
