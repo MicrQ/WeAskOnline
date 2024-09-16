@@ -11,10 +11,10 @@ class UserRole(db.Model):
 
     id = db.Column(db.Integer, primary_key=True,
                    autoincrement=True, nullable=False)
-    user_id = db.Column(db.String(256),
+    user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
-    role_id = db.Column(db.String(256),
+    role_id = db.Column(db.Integer,
                         db.ForeignKey('roles.id', ondelete='CASCADE'),
                         nullable=False)
     user = db.relationship('User',

@@ -168,7 +168,7 @@ def get_question(id, title=None):
         abort(404)
 
     # redirecting the user to the endpoint + title
-    route_title = question.title.lower().replace(" ", "-")
+    route_title = question.title.lower().replace(" ", "-").strip('?')
     if not title or title != route_title:
         return redirect(
             f'/api/v1/questions/{id}/{route_title}')

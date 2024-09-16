@@ -97,7 +97,7 @@ def delete_comment(id, comment_id):
 
     # Check if the current user is the owner of the comment and have
     # access to delete the comment else abort 401
-    if int(comment.user_id) == user.id:
+    if comment.user_id == user.id:
         db.session.delete(comment)
         db.session.commit()
         return jsonify({'message': 'Success, comment deleted'}), 200
