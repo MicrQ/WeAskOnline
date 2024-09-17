@@ -36,7 +36,7 @@ def login():
     # make call to database to fetch user data and compare it
     user = db.session.query(User).filter_by(username=username).first()
     if user is None:
-        return jsonify({"error": "Invalid username"}), 400
+        return jsonify({"error": "Invalid username"}), 401
     if check_password_hash(user.password, password):
         # store the token on the user cookie with key & token as value
         if not user.isActive:
@@ -56,7 +56,7 @@ def login():
         res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
         return res, 200
     else:
-        return jsonify({"error": "Incorrect password"})
+        return jsonify({"error": "Incorrect password"}), 401
 
 
 @auth.route('/api/v1/register', methods=['POST'])

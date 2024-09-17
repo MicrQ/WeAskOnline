@@ -2,7 +2,6 @@
 """ test for question endpoints """
 import unittest
 from app import app
-from models.base import db
 
 
 class TestQuestion(unittest.TestCase):
