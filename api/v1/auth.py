@@ -122,7 +122,6 @@ def register():
             "link": f"http://localhost:5000/api/v1/verify-email?key={encoded_email}"
             }), 201
     except Exception as e:
-        print(f"Error: {e}", exc_info=True)
         return jsonify(
             {"error": "Server error, empty data found"}
             ), 500
@@ -151,7 +150,6 @@ def verify_email():
         if not user_otp or not isinstance(int(user_otp), int):
             return jsonify({"error": "Please, provide valid OTP"}), 400
     except ValueError:
-        print("user provided a non integer parameter")
         return jsonify({"error": "Please, provide valid OTP"}), 400
 
     # Connect to redis and fetch token
