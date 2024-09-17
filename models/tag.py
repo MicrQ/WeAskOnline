@@ -14,3 +14,10 @@ class Tag(db.Model):
     def __init__(self, name):
         """ Tag Initializer """
         self.name = name.lower()
+    
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'name': self.name
+        }
