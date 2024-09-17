@@ -1,3 +1,6 @@
+# WeAsk.Online API Documentation
+
+
 ## Registration
 
 `POST /api/v1/register`
@@ -103,5 +106,73 @@ curl --location 'http://localhost:5000/api/v1/verify-email?key=ZXhhbXBsZUBlbWFpb
 {
     "error": "token expired or invalid"
 }
+
 ```
 
+
+## Login
+`POST /api/v1/login`
+
+* To create a question, comment on a question, reply on a comment or vote, the user must be registered and already logged in.
+
+### body
+```
+curl --location 'http://localhost:5000/api/v1/login' \
+    --form 'username="user123"' \
+    --form 'password="password@123"'
+```
+
+### Response
+#### Success - 200 OK :
+
+* On valid logging credentials, `api-token` set to users' cookie which is valid for 5 days and the following json will be responded.
+```
+{
+    "api-token": "8db0c0d3-3d13-4a89-b577-941404c9e608",
+    "message": "Success"
+}
+```
+
+#### Error - 400 Bad Request :
+
+* If required field is missing from the body
+```
+{
+    "error": "Missing [fieldname]"
+}
+```
+
+#### Error - 401 Unauthorized :
+
+* Invalid username
+```
+{
+    "error": "Invalid username"
+}
+```
+
+* Incorrect password
+```
+{
+    "error": "Incorrect password"
+}
+```
+
+#### Error - 403 Forbidden :
+
+* If the user account is banned or user deleted their account
+
+```
+{
+    "error": "User account is inactive"
+}
+```
+
+#### Error - 500 Server Error :
+
+* If redis server is not running or failed
+```
+{
+    "error": "Couldn't  connect to Redis server"
+}
+```
