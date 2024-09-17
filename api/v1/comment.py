@@ -90,9 +90,7 @@ def delete_comment(id, comment_id):
             question_id=id, id=comment_id).first()
         if not comment:
             abort(404)
-        print("safe .......")
     except Exception as e:
-        print("Error with fetching data from db: ", str(e))
         abort(404)
 
     # Check if the current user is the owner of the comment and have
