@@ -153,7 +153,7 @@ def get_questions():
         question['upvotes'] = 0
         question['downvotes'] = 0
         for vote in votes:
-            if vote.isUpvote:
+            if vote.is_upvote:
                 question['upvotes'] += 1
             else:
                 question['downvotes'] += 1

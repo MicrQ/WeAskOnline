@@ -28,3 +28,11 @@ class QuestionTag(db.Model):
         """ QuestionTag Initializer """
         self.question_id = question_id
         self.tag_id = tag_id
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'question_id': self.question_id,
+            'tag_id': self.tag_id
+        }
