@@ -26,7 +26,7 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    username: str = request.form.get("username", None)
+    username: str = request.form.get("username", None).lower()
     password: str = request.form.get("password", None)
     if username is None:
         return jsonify({"error": "Missing username"}), 400
@@ -56,7 +56,7 @@ def login():
         res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
         return res, 200
     else:
-        return jsonify({"error": "Incorrect password"})
+        return jsonify({"error": "Incorrect password"}), 401
 
 
 @auth.route('/api/v1/register', methods=['POST'])
