@@ -14,10 +14,10 @@ class Comment(db.Model):
     body = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isEdited = db.Column(db.Boolean, nullable=False, default=False)
-    user_id = db.Column(db.String(256),
+    user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
-    question_id = db.Column(db.String(256), db.ForeignKey(
+    question_id = db.Column(db.Integer, db.ForeignKey(
         'questions.id', ondelete='CASCADE'), nullable=False)
 
     user = db.relationship('User',
@@ -32,3 +32,14 @@ class Comment(db.Model):
         self.created_at = created_at
         self.user_id = user_id
         self.question_id = question_id
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'body': self.body,
+            'created_at': self.created_at,
+            'isEdited': self.isEdited,
+            'user_id': self.user_id,
+            'question_id': self.question_id
+        }

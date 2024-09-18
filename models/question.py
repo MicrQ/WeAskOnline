@@ -22,7 +22,7 @@ class Question(db.Model):
                            nullable=False)
     isActive = db.Column(db.Boolean, nullable=False, default=True)
 
-    user_id = db.Column(db.String(256),
+    user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
     user = db.relationship('User',
@@ -36,3 +36,14 @@ class Question(db.Model):
         self.user_id = user_id
         if updated_at:
             self.updated_at = updated_at
+
+    def to_dict(self):
+        """ returns the dictionary version of the model """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'user_id': self.user_id
+        }

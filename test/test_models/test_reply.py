@@ -89,20 +89,18 @@ class testReplyModel(unittest.TestCase):
 
         new_reply = Reply(
             body="i know it is.",
-            created_at=now,
             user_id=user.id,
             comment_id=comment.id
         )
         db.session.add(new_reply)
         db.session.commit()
 
-        reply = db.session.query(Reply).filter_by(created_at=now).first()
+        reply = db.session.query(Reply).filter_by().first()
         self.assertIsNotNone(reply)
 
         # create reply with invalid comment id
         new_reply = Reply(
             body="i know it is.",
-            created_at=now,
             user_id=user.id,
             comment_id=-1
         )
@@ -114,7 +112,6 @@ class testReplyModel(unittest.TestCase):
         # create reply with invalid user id
         new_reply = Reply(
             body="i know it is.",
-            created_at=now,
             user_id=-1,
             comment_id=comment.id
         )

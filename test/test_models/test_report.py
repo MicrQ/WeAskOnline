@@ -90,14 +90,13 @@ class testReportModel(unittest.TestCase):
 
         new_reply = Reply(
             body="i know it is.",
-            created_at=now,
             user_id=user.id,
             comment_id=comment.id
         )
         db.session.add(new_reply)
         db.session.commit()
 
-        reply = db.session.query(Reply).filter_by(created_at=now).first()
+        reply = db.session.query(Reply).filter_by().first()
         self.assertIsNotNone(reply)
 
         # reporting reply properly

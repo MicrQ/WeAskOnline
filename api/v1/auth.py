@@ -22,14 +22,16 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    username = request.form.get("username")
-    password = request.form.get("password")
-    if not username or not password:
-        return jsonify({"error": "Missing username or password"}), 400
+    username: str = request.form.get("username", None).lower()
+    password: str = request.form.get("password", None)
+    if username is None:
+        return jsonify({"error": "Missing username"}), 400
+    if password is None:
+        return jsonify({"error": "Missing password"}), 400
 
     user = db.session.query(User).filter_by(username=username).first()
     if user is None:
-        return jsonify({"error": "Invalid username"}), 400
+        return jsonify({"error": "Invalid username"}), 401
     if check_password_hash(user.password, password):
         if not user.isActive:
             return jsonify({"error": "User account is inactive"}), 403
@@ -48,7 +50,7 @@ def login():
         res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
         return res, 200
     else:
-        return jsonify({"error": "Incorrect password"})
+        return jsonify({"error": "Incorrect password"}), 401
 
 
 @auth.route('/api/v1/register', methods=['POST'])
@@ -111,7 +113,9 @@ def register():
 
     except Exception as e:
         print(f"Error: {e}", exc_info=True)
-        return jsonify({"error": "Server error, empty data found"}), 500
+        return jsonify(
+            {"error": "Server error, empty data found"}
+            ), 500
 
 
 @auth.route('/api/v1/verify-email', methods=['POST'])
@@ -137,7 +141,7 @@ def verify_email():
         if not user_otp or not isinstance(int(user_otp), int):
             return jsonify({"error": "Please, provide valid OTP"}), 400
     except ValueError:
-        print("User provided a non-integer parameter")
+        print("user provided a non integer parameter")
         return jsonify({"error": "Please, provide valid OTP"}), 400
 
     # Connect to redis and fetch token
@@ -148,6 +152,8 @@ def verify_email():
     user_data = {k.decode(): v.decode() for k, v in user_data.items()}
     user_data['created_at'] = datetime.now()
     user_data['updated_at'] = datetime.now()
+    print(user_data)
+    print(type(user_data))
 
     otp = user_data.get('token')
 
@@ -172,9 +178,21 @@ def logout():
     Deletes the found token from the cookie stored in the user's browser and
     also logs out the user
     """
+    redis = RedisServer()
+    if not redis:
+        return jsonify({"error": "Redis server is not running"}), 500
+
+    # find the token and delete it & handle cases where the token is not in
+    # the redis cache
     res = jsonify({"message": "Logged out successfully"})
-    res.delete_cookie('api-token')
-    return res, 204
+    try:
+        redis_value = redis.delete(res.cookies.get('api-token'))
+        if not redis_value:
+            return jsonify({'error': 'Token not found'}), 400
+        res.delete_cookie('api-token')
+        return res, 204
+    except:
+        return jsonify({'error': 'Token not found'}), 400
 
 
 @auth.route('/api/v1/reset-password', methods=["POST"])

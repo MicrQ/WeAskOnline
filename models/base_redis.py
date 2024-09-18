@@ -68,7 +68,7 @@ class RedisServer():
         self.redis_client.set(key, value, timedelta(days=2.0))
         return True
     
-    def hset(self, user_email, token, user_data):
+    def hset(self, user_email, token, user_data) -> bool:
         """Stores a key with a mapped data object (Dict) or a single data
 
         to an existing/new key with the [name, key, value]
@@ -85,3 +85,10 @@ class RedisServer():
         Gets all the values associated with the email passed as a parameter
         """
         return self.redis_client.hgetall(email)
+    
+    def delete(self, key) -> bool:
+        """ Deletes the key from the redis cache and returns True """
+        if not key:
+            return False
+        else:
+            self.redis_client.delete(key)

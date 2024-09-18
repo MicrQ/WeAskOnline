@@ -12,10 +12,10 @@ class Report(db.Model):
     reason = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     isResolved = db.Column(db.Boolean, nullable=False, default=False)
-    user_id = db.Column(db.String(256),
+    user_id = db.Column(db.Integer,
                         db.ForeignKey('users.id', ondelete='CASCADE'),
                         nullable=False)
-    parent_id = db.Column(db.String(256), nullable=False)
+    parent_id = db.Column(db.Integer, nullable=False)
     parent_type = db.Column(db.String(256), nullable=False)
 
     user = db.relationship('User',
