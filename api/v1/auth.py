@@ -26,7 +26,7 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    username: str = request.form.get("username", None)
+    username: str = request.form.get("username", None).lower()
     password: str = request.form.get("password", None)
     if username is None:
         return jsonify({"error": "Missing username"}), 400
@@ -183,9 +183,21 @@ def logout():
     Deletes the found token from the cookie stored in the user's browser and
     also logs out the user
     """
+    redis = RedisServer()
+    if not redis:
+        return jsonify({"error": "Redis server is not running"}), 500
+
+    # find the token and delete it & handle cases where the token is not in
+    # the redis cache
     res = jsonify({"message": "Logged out successfully"})
-    res.delete_cookie('api-token')
-    return res, 204
+    try:
+        redis_value = redis.delete(res.cookies.get('api-token'))
+        if not redis_value:
+            return jsonify({'error': 'Token not found'}), 400
+        res.delete_cookie('api-token')
+        return res, 204
+    except:
+        return jsonify({'error': 'Token not found'}), 400
 
 
 @auth.route('/api/v1/reset-password', methods=["POST"])
