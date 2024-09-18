@@ -196,7 +196,7 @@ curl --location 'http://localhost:5000/api/v1/questions' \
     --data '{
         "title": string,
         "body": string,
-        "tags": [string, string, ...]
+        "tags": [string, string, ...]   # optional
     }'
 ```
 
@@ -236,4 +236,284 @@ curl --location 'http://localhost:5000/api/v1/questions' \
 }
 ```
 
+<br/>
+<br/>
+<br/>
 
+# Update/Put a question
+`PUT /api/v1/questions/<int:id>`
+
+* To update a question
+```
+curl --location --request PUT 'http://localhost:5000/api/v1/questions/<int:id>' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "title": string,
+        "body": string,
+        "tags": [string, string, ...]   # optional
+    }'
+```
+
+### Response
+#### Success - 200 OK :
+
+* On valid update the following response will be sent.
+```
+{
+    'message': 'Question updated'
+}
+```
+
+#### Error - 401 Unauthorized :
+
+* If the `api-token` is not found in the header or if the token is expired.
+```
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 403 Forbidden :
+
+* If the user is NOT the owner of the question.
+```
+{
+    'Error': 'You don\'t have permission to delete this question'
+}
+```
+
+#### Error - 400 Bad Request :
+
+* If the `Content-Type` is not `application/json`
+```
+{
+    'Error': 'Invalid JSON data'
+}
+```
+
+* If the required field is missing.
+```
+{
+    "Error": "Missing [fieldname]"
+}
+```
+
+#### Error - 404 Not Found :
+
+* If the question with the given id is not found.
+```
+{
+    "Error": "Not Found"
+}
+```
+
+<br/>
+<br/>
+<br/>
+
+# DELETE a question
+`DELETE /api/v1/questions/<int:id>`
+
+* To delete a question
+
+### body
+```
+curl --location --request DELETE 'http://localhost:5000/api/v1/questions/<int:id>' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608'
+```
+
+### Response
+#### Success - 200 OK :
+
+* On successful deletion
+```
+{
+    'message': 'Question deleted'
+}
+```
+
+#### Error - 401 Unauthorized :
+* If the `api-token` is not found in the header or if the token is expired.
+```
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 403 Forbidden :
+* If the user is not the owner of the question
+```
+{
+    'Error': 'You don\'t have permission to delete this question'
+}
+```
+#### Error - 404 Not Found :
+* If the question with the given Id is not found.
+```
+{
+    "Error": "Not Found"
+}
+```
+
+<br/>
+<br/>
+<br/>
+
+# GET Questions
+`GET /api/v1/questions`
+
+* To get all questions
+
+### body
+```
+curl --location 'http://localhost:5000/api/v1/questions' 
+```
+
+### Response
+#### Success - 200 OK :
+
+```
+[
+    {
+        "body": "I Heard That Weask Online Is The Best Community To Learn. Can Anyone Tell Me More About That Platform Please.",
+        "comments": 32,
+        "created_at": "Tue, 17 Sep 2024 19:46:35 GMT",
+        "downvotes": 2,
+        "id": 2,
+        "title": "What Is Weask.Online?",
+        "updated_at": "Tue, 17 Sep 2024 19:46:35 GMT",
+        "upvotes": 450,
+        "user_id": 1
+    },
+    {
+        "body": "I Want To Create A Simple Crud App With Python And Sqlite.",
+        "comments": 16,
+        "created_at": "Mon, 16 Sep 2024 10:43:00 GMT",
+        "downvotes": 4,
+        "id": 1,
+        "title": "How To Use Flask With Sqlite?",
+        "updated_at": "Mon, 16 Sep 2024 10:43:00 GMT",
+        "upvotes": 24,
+        "user_id": 1
+    },
+    .
+    .
+    .
+]
+```
+
+<br />
+<br />
+<br />
+
+# GET Question
+`GET /api/v1/questions/<int:id>`
+* To get single question
+
+### body
+```
+curl --location 'http://localhost:5000/api/v1/questions/1'
+```
+
+### Response
+#### Success - 302 Found :
+* Will be redirected to `/api/v1/questions/<int:id>/<string:title>`
+```
+{
+    "body": "I Want To Create A Simple Crud App With Python And Sqlite.",
+    "comments": [
+        {
+            "body": "Pay for me and i will teach you!",
+            "created_at": "Mon, 16 Sep 2024 11:05:35 GMT",
+            "id": 1,
+            "isEdited": false,
+            "question_id": 1,
+            "replies": [
+                {
+                    "body": "How much?",
+                    "comment_id": 1,
+                    "created_at": "Mon, 16 Sep 2024 11:38:11 GMT",
+                    "id": 1,
+                    "isEdited": false,
+                    "user_id": 2,
+                    "upvotes": 3,
+                    "downvotes": 2
+                },
+                {
+                    "body": "Why would i pay you?",
+                    "comment_id": 1,
+                    "created_at": "Mon, 16 Sep 2024 11:41:52 GMT",
+                    "id": 2,
+                    "isEdited": true,
+                    "user_id": 3,
+                    "upvotes": 4,
+                    "downvotes: 1
+                }
+            ],
+            "user_id": 1
+        }
+    ],
+    "created_at": "Mon, 16 Sep 2024 10:43:00 GMT",
+    "downvotes": 20,
+    "id": 1,
+    "title": "How To Use Flask With Sqlite?",
+    "updated_at": "Mon, 16 Sep 2024 10:43:00 GMT",
+    "upvotes": 5,
+    "user_id": 1
+}
+```
+
+#### Error - 404
+* If the question with the given id is not found.
+
+```
+{
+    "Error": "Not Found"
+}
+```
+
+<br />
+<br />
+<br />
+
+
+# Search for Question
+`GET /api/v1/questions/search?q=<keyword>`
+
+* To search for a question using a keyword from question titles.
+
+### body
+```
+curl --location 'http://localhost:5000/api/v1/questions/search?q=weask'
+```
+
+### Response
+#### Success - 200 OK :
+```
+[
+    {
+        "body": "I Heard That Weask Online Is The Best Community To Learn. Can Anyone Tell Me More About That Platform Please.",
+        "created_at": "Tue, 17 Sep 2024 19:46:35 GMT",
+        "id": 2,
+        "title": "What Is Weask.Online?",
+        "updated_at": "Tue, 17 Sep 2024 19:46:35 GMT",
+        "user_id": 1
+    },
+    .
+    .
+    .
+]
+```
+
+### Error - 404 Not Found :
+* When the question with the given keyword is not found.
+
+```
+{
+    "Error": "Not Found"
+}
+```
+
+### Redirect - 302 Found :
+* If the query parameter value is empty or not given, redirected to `/api/v1/questions`.
