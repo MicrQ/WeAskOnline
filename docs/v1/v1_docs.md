@@ -9,7 +9,7 @@
 Used to register a new user.
 
 ### body
-```
+```bash
 curl --location 'localhost:5000/api/v1/register' \
     --form 'firstname="John"' \
     --form 'lastname="Doe"' \
@@ -73,7 +73,7 @@ curl --location 'localhost:5000/api/v1/register' \
 * In order to be registered successfully, the user is required the verify their email using the like provided in the registration response.
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/verify-email?key=ZXhhbXBsZUBlbWFpbC5jb20%3D' \
     --form 'otp="12345"'
 ```
@@ -119,7 +119,7 @@ curl --location 'http://localhost:5000/api/v1/verify-email?key=ZXhhbXBsZUBlbWFpb
 * To create a question, comment on a question, reply on a comment or vote, the user must be registered and already logged in.
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/login' \
     --form 'username="user123"' \
     --form 'password="password@123"'
@@ -189,7 +189,7 @@ curl --location 'http://localhost:5000/api/v1/login' \
 * To create or post a new question, the user must be logged in and have the `api-token` in the request header
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/questions' \
     --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
     --header 'Content-Type: application/json' \
@@ -244,7 +244,8 @@ curl --location 'http://localhost:5000/api/v1/questions' \
 `PUT /api/v1/questions/<int:id>`
 
 * To update a question
-```
+### body
+```bash
 curl --location --request PUT 'http://localhost:5000/api/v1/questions/<int:id>' \
     --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
     --header 'Content-Type: application/json' \
@@ -318,7 +319,7 @@ curl --location --request PUT 'http://localhost:5000/api/v1/questions/<int:id>' 
 * To delete a question
 
 ### body
-```
+```bash
 curl --location --request DELETE 'http://localhost:5000/api/v1/questions/<int:id>' \
     --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608'
 ```
@@ -366,7 +367,7 @@ curl --location --request DELETE 'http://localhost:5000/api/v1/questions/<int:id
 * To get all questions
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/questions' 
 ```
 
@@ -412,7 +413,7 @@ curl --location 'http://localhost:5000/api/v1/questions'
 * To get single question
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/questions/1'
 ```
 
@@ -464,7 +465,7 @@ curl --location 'http://localhost:5000/api/v1/questions/1'
 }
 ```
 
-#### Error - 404
+#### Error - 404 Not Found :
 * If the question with the given id is not found.
 
 ```
@@ -484,7 +485,7 @@ curl --location 'http://localhost:5000/api/v1/questions/1'
 * To search for a question using a keyword from question titles.
 
 ### body
-```
+```bash
 curl --location 'http://localhost:5000/api/v1/questions/search?q=weask'
 ```
 
@@ -517,4 +518,261 @@ curl --location 'http://localhost:5000/api/v1/questions/search?q=weask'
 
 ### Redirect - 302 Found :
 * If the query parameter value is empty or not given, redirected to `/api/v1/questions`.
+<br />
+<br />
+<br />
 
+# Create/POST comment :
+`POST /api/v1/questions/<int:question_id>/comments`
+* To post a comment
+### body
+```bash
+curl --location 'http://localhost:5000/api/v1/questions/1/comments' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "body": "comment content"
+    }'
+```
+
+### Response
+#### Success - 201 Created :
+* On valid comment creation
+```
+{
+    'message': 'Success, comment created'
+}
+```
+
+#### Error - 401 Unauthorized :
+* If the `api-token` is not found in the header or if the token is expired.
+```
+{
+    "Error": "Not authorized"
+}
+```
+
+
+#### Error - 404 Not Found :
+* If the question with the given id is not found.
+
+```
+{
+    "Error": "Not Found"
+}
+```
+
+#### Error - 400 Bad Request :
+* If the `Content-Type` is not `application/json`
+```json
+{
+    "error": "Invalid JSON data"
+}
+```
+
+* If required field is missing
+```json
+{
+    "error": "Missing comment body"
+}
+```
+
+<br />
+<br />
+<br />
+
+# Update/PUT comment:
+`PUT /api/v1/questions/<int:question_id>/comments/<int:comment_id>`
+
+* To update an existing comment.
+
+### Body
+```bash
+curl --location --request PUT 'http://localhost:5000/api/v1/questions/1/comments/1' \
+    --header 'Content-Type: application/json' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --data-raw '{
+        "body": "Updated comment content"
+    }'
+```
+
+### Response
+#### Success - 200 OK:
+
+* On successful comment update.
+
+```json
+{
+    "message": "Success, comment updated."
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found in the header or if the token is expired.
+
+```json
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Errer - 403 Forbidden:
+* If the user does not have permission to edit the comment.
+
+```json
+{
+    "Error": "You don't have permission to edit this comment"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the question or the comment with the given id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+
+#### Error - 400 Bad Request:
+
+* If the Content-Type is not application/json.
+
+```json
+{
+    "error": "Invalid JSON data"
+}
+```
+
+* If required fields are missing.
+
+```json
+{
+    "error": "Missing comment body"
+}
+```
+
+<br />
+<br />
+<br />
+
+# DELETE comment:
+`DELETE /api/v1/questions/<int:question_id>/comments/<int:comment_id>`
+
+* To delete an existing comment if the user is the owner of the comment.
+
+### Body
+```bash
+curl --location --request DELETE 'http://localhost:5000/api/v1/questions/1/comments/1' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608'
+```
+
+### Response
+#### Success - 200 OK:
+
+* On successful comment deletion.
+
+```json
+{
+    "message": "Success, comment deleted"
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found in the header or if the token is expired.
+
+```json
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 403 Forbidden:
+
+* If the user does not have permission to delete the comment.
+
+``` json
+{
+    "Error": "You don't have permission to delete this comment"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the question or the comment with the given id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+<br/>
+<br/>
+<br/>
+
+# Create/POST reply:
+`POST /api/v1/comments/<int:comment_id>/reply`
+
+* To create a new reply to a comment.
+
+### Body
+```bash
+curl --location --request POST 'http://localhost:5000/api/v1/comments/1/reply' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "body": "This is a reply."
+    }'
+```
+
+### Response
+#### Success - 201 Created:
+
+* On successful reply creation.
+
+```json
+{
+    "message": "Reply created successfully."
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found in the header or if the token is expired.
+
+```json
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the comment with the given comment_id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+
+### Error - 400 Bad Request:
+
+* If the Content-Type is not application/json.
+
+```json
+{
+    "Error": "Invalid JSON data"
+}
+```
+
+* If the required field body is missing.
+
+```json
+{
+    "Error": "Missing [fieldname]"
+}
+```
