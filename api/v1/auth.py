@@ -189,11 +189,10 @@ def logout():
 
     # find the token and delete it & handle cases where the token is not in
     # the redis cache
-    res = jsonify({"message": "Logged out successfully"})
+    token = request.cookies.get('api-token')
     try:
-        redis_value = redis.delete(res.cookies.get('api-token'))
-        if not redis_value:
-            return jsonify({'error': 'Token not found'}), 400
+        redis.delete(token)
+        res = jsonify({"message": "Logged out successfully"})
         res.delete_cookie('api-token')
         return res, 204
     except:
