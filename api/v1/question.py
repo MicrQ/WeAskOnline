@@ -33,9 +33,11 @@ def create_question():
     if not user:
         abort(401)
 
-    data = request.get_json()
-    if not data:
+    try:
+        data = request.get_json()
+    except Exception:
         return jsonify({'Error': 'Invalid JSON data'}), 400
+
     title = data.get('title')
     if not title:
         return jsonify({'Error': 'Missing title'}), 400
