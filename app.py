@@ -9,6 +9,7 @@ from api.v1.question import question
 from api.v1.comment import comment
 from api.v1.reply import reply
 from sqlalchemy import text
+from api.v1.vote import vote
 
 
 app = Flask(__name__)
@@ -25,6 +26,7 @@ app.register_blueprint(question)
 app.register_blueprint(comment)
 app.register_blueprint(reply)
 app.register_blueprint(tag)
+app.register_blueprint(vote)
 
 with app.app_context():
     if onDevelopment:
