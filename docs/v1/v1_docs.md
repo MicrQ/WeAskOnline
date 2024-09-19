@@ -776,3 +776,323 @@ curl --location --request POST 'http://localhost:5000/api/v1/comments/1/reply' \
     "Error": "Missing [fieldname]"
 }
 ```
+<br />
+<br />
+<br />
+
+# Update/PUT reply:
+`PUT /api/v1/comments/<int:comment_id>/reply/<int:reply_id>`
+
+* To update an existing reply to a comment.
+
+### Body
+```bash
+curl --location --request PUT 'http://localhost:5000/api/v1/comments/1/reply/1' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "body": "This is an updated reply."
+    }'
+```
+
+### Response
+#### Success - 200 OK:
+
+* On successful update of the reply.
+
+``` json
+{
+    "message": "Reply updated successfully."
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found in the header or if the token is expired.
+
+```json
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the comment with the given comment_id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+
+* If the reply with the given reply_id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+
+#### Error - 403 Forbidden:
+
+* If the current user does not have permission to update the reply.
+
+```json
+{
+    "Error": "You don't have permission to update this reply."
+}
+```
+
+#### Error - 400 Bad Request:
+
+* If the Content-Type is not application/json.
+
+```json
+{
+    "Error": "Invalid JSON data"
+}
+```
+
+* If the required field body is missing.
+
+```json
+{
+    "Error": "Missing body"
+}
+```
+
+<br />
+<br />
+<br />
+
+# DELETE reply:
+`DELETE /api/v1/comments/<int:comment_id>/reply/<int:reply_id>`
+
+* To delete an existing reply to a comment.
+
+### Body
+```bash
+curl --location --request DELETE 'http://localhost:5000/api/v1/comments/1/reply/1' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608'
+```
+
+### Response
+#### Success - 200 OK:
+
+* On successful deletion of the reply.
+
+```json
+{
+    "message": "Reply deleted successfully."
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found in the header or if the token is expired.
+
+```json
+{
+    "Error": "Not authorized"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the comment with the given comment_id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+
+* If the reply with the given reply_id is not found.
+
+```json
+{
+    "Error": "Not Found"
+}
+```
+#### Error - 403 Forbidden:
+
+* If the current user does not have permission to delete the reply.
+
+```json
+{
+    "Error": "You don't have permission to delete this reply."
+}
+```
+
+#### Error - 500 Internal Server Error:
+
+* If the Redis server is unavailable.
+
+```json
+{
+    "Error": "Redis server not available"
+}
+```
+
+<br />
+<br />
+<br />
+
+# Vote(Like/Dislike) on post:
+`POST /api/v1/vote/<string:entity>/<int:id>`
+
+* To create or update a vote for an entity (question, comment, or reply).
+
+### Body
+```bash
+# to vote question
+curl --location --request POST 'http://localhost:5000/api/v1/vote/question/1' \
+    --header 'Content-Type: application/json' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --data-raw '{
+        "vote": "upvote"
+    }'
+
+# to vote comment
+curl --location --request POST 'http://localhost:5000/api/v1/vote/comment/1' \
+    --header 'Content-Type: application/json' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --data-raw '{
+        "vote": "downvote"
+    }'
+
+# to vote reply
+curl --location --request POST 'http://localhost:5000/api/v1/vote/reply/1' \
+    --header 'Content-Type: application/json' \
+    --header 'Cookie: api-token=8db0c0d3-3d13-4a89-b577-941404c9e608' \
+    --data-raw '{
+        "vote": "novote"
+    }'
+```
+
+#### JSON Body Fields:
+
+    vote (required): The type of vote, which can be one of:
+        "upvote"
+        "downvote"
+        "novote" (to remove an existing vote)
+
+### Response
+#### Success - 200 OK:
+
+* On successful creation or modification of the vote.
+
+```json
+{
+    "message": "Success"
+}
+```
+
+#### Error - 401 Unauthorized:
+
+* If the api-token is not found or if the token is expired.
+
+```json
+{
+    "error": "Not authorized"
+}
+```
+
+#### Error - 404 Not Found:
+
+* If the entity type is invalid (not a comment, question, or reply), or if the entity with the given id is not found.
+
+``` json
+{
+    "error": "Not Found"
+}
+```
+#### Error - 400 Bad Request:
+
+* If the body is missing or malformed.
+
+```json
+{
+    "error": "Empty body found"
+}
+```
+
+* If the vote field is missing or invalid.
+
+```json
+{
+    "error": "Missing vote entity"
+}
+```
+
+* If an invalid vote type is provided.
+
+```json
+{
+    "error": "Invalid vote entity"
+}
+```
+
+#### Error - 500 Internal Server Error:
+
+* If the Redis server is unavailable.
+
+```json
+{
+    "error": "Redis server is not running"
+}
+```
+
+<br />
+<br />
+<br />
+
+# Get Tags:
+`GET /api/v1/tags`
+
+* Retrieves all available tags and returns them in JSON format along with the count of how many questions are associated with each tag.
+
+### Response
+
+#### Success - 200 OK:
+* On successful retrieval of all tags, the response will include a list of tags, each with a `count` field that indicates how many times the tag is used.
+```json
+[
+    {
+        "id": 1,
+        "name": "Python",
+        "count": 10
+    },
+    {
+        "id": 2,
+        "name": "Flask",
+        "count": 5
+    },
+    .
+    .
+    .
+]
+```
+
+#### No Content - 204 No Content:
+
+* If no tags are found in the database.
+
+```json
+{}
+```
+
+#### Error - 500 Internal Server Error:
+
+* If an issue occurs while querying the database.
+
+```json
+{
+    "error": "Internal Server Error"
+}
+```
+
+<br/>
+<br/>
+<br/>
