@@ -43,3 +43,14 @@ class User(db.Model):
         self.country_id = country_id
         self.profile_image = profile_image
         self.isActive = isActive
+
+    def to_dict(self) -> dict:
+        """returns a dict representation of the user data"""
+        user = db.session.query(User).filter_by(username=self.username).first()
+        return {
+            "username": self.username,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "profile_image": self.profile_image,
+            "user_id": user.id
+            }
