@@ -43,21 +43,21 @@ def login():
         if not user.isActive:
             return jsonify({"error": "User account is inactive"}), 403
 
-        token: str = str(uuid4())
+            token: str = str(uuid4())
 
-        redisConnect = RedisServer()
-        resp = redisConnect.set_token(token, username)
+            redisConnect = RedisServer()
+            resp = redisConnect.set_token(token, username)
 
-        # Check if token was stored in redis server
-        if not resp:
-            return jsonify({"error": "Couldn't  connect to Redis server"}), 500
+            # Check if token was stored in redis server
+            if not resp:
+                return jsonify({"error": "Couldn't  connect to Redis server"}), 500
 
-        # Store the token in the cookie session & expire age at 5 days
-        res = jsonify({"message": "Success", "api-token": token})
-        res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
-        return res, 200
-    else:
-        return jsonify({"error": "Incorrect password"}), 401
+            # Store the token in the cookie session & expire age at 5 days
+            res = jsonify({"message": "Success", "api-token": token})
+            res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
+            return res, 200
+        else:
+            return jsonify({"error": "Incorrect password"}), 401
 
 
 @auth.route('/api/v1/register', methods=['POST'])
@@ -190,11 +190,10 @@ def logout():
 
     # find the token and delete it & handle cases where the token is not in
     # the redis cache
-    res = jsonify({"message": "Logged out successfully"})
+    token = request.cookies.get('api-token')
     try:
-        redis_value = redis.delete(res.cookies.get('api-token'))
-        if not redis_value:
-            return jsonify({'error': 'Token not found'}), 400
+        redis.delete(token)
+        res = jsonify({"message": "Logged out successfully"})
         res.delete_cookie('api-token')
         return res, 204
     except:

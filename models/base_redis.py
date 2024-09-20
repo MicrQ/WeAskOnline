@@ -86,9 +86,8 @@ class RedisServer():
         """
         return self.redis_client.hgetall(email)
     
-    def delete(self, key) -> bool:
+    def delete(self, key: str) -> bool:
         """ Deletes the key from the redis cache and returns True """
         if not key:
             return False
-        else:
-            self.redis_client.delete(key)
+        self.redis_client.delete(key)

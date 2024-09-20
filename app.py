@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ flask app """
 from flask import Flask
+from api.v1.user import user
 from api.v1.tag import tag
 from api.v1.auth import auth
 from models.base import db
@@ -26,6 +27,7 @@ app.register_blueprint(question)
 app.register_blueprint(comment)
 app.register_blueprint(reply)
 app.register_blueprint(tag)
+app.register_blueprint(user)
 app.register_blueprint(vote)
 
 with app.app_context():
