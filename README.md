@@ -7,18 +7,9 @@ WeAsk.Online is a question-and-answer platform that allows users to ask, answer,
 2. [Installation](#installation)
 3. [Running the Application](#running-the-application)
 4. [Usage Guidelines](#usage-guidelines)
-5. [API Documentation](#api-documentation)
-    - [Registration](#registration)
-    - [Email Verification](#email-verification)
-    - [Login](#login)
-    - [Create/Post Question](#createpost-question)
-    - [Update/Put a Question](#updateput-a-question)
-    - [Delete a Question](#delete-a-question)
-    - [Get Questions](#get-questions)
-    - [Get a Single Question](#get-a-single-question)
-6. [Contribution](#contribution)
-7. [License](#license)
-
+5. [Documentation](#api-documentation)
+6. [For Contributions](#For-Contributions)
+7. [About Authors](#About-Authors)
 ---
 
 ## Overview
@@ -101,7 +92,7 @@ We welcome contributions to `WeAsk.Online!` If you would like to contribute, ple
 
 `Please ensure that your code adheres to our coding standards and includes appropriate tests.`
 
-## WeAsk.Online API Documentation
-[WeAsk.Online](https://github.com/MicrQ/WeAskOnline/blob/main/docs/v1/v1_docs.md)
-## Authors
+##  API Documentation
+[Documentation](https://github.com/MicrQ/WeAskOnline/blob/main/docs/v1/v1_docs.md)
+## About Authors
 [Authors](https://github.com/MicrQ/WeAskOnline/blob/main/AUTHORS)
