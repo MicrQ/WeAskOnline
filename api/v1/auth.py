@@ -26,37 +26,41 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    username: str = request.form.get("username", None).lower()
-    password: str = request.form.get("password", None)
-    if username is None:
-        return jsonify({"error": "Missing username"}), 400
-    if password is None:
-        return jsonify({"error": "Missing password"}), 400
+    try:
+        username: str = request.form.get("username", None).lower()
+        password: str = request.form.get("password", None)
+        if username is None:
+            return jsonify({"error": "Missing username"}), 400
+        if password is None:
+            return jsonify({"error": "Missing password"}), 400
 
-    # make call to database to fetch user data and compare it
-    user = db.session.query(User).filter_by(username=username).first()
-    if user is None:
-        return jsonify({"error": "Invalid username"}), 401
-    if check_password_hash(user.password, password):
-        # store the token on the user cookie with key & token as value
-        if not user.isActive:
-            return jsonify({"error": "User account is inactive"}), 403
+        # make call to database to fetch user data and compare it
+        user = db.session.query(User).filter_by(username=username).first()
+        if user is None:
+            return jsonify({"error": "Invalid username"}), 401
+        if check_password_hash(user.password, password):
+            # store the token on the user cookie with key & token as value
+            if not user.isActive:
+                return jsonify({"error": "User account is inactive"}), 403
 
-        token: str = str(uuid4())
+            token: str = str(uuid4())
 
-        redisConnect = RedisServer()
-        resp = redisConnect.set_token(token, username)
+            redisConnect = RedisServer()
+            resp = redisConnect.set_token(token, username)
 
-        # Check if token was stored in redis server
-        if not resp:
-            return jsonify({"error": "Couldn't  connect to Redis server"}), 500
+            # Check if token was stored in redis server
+            if not resp:
+                return jsonify({"error": "Couldn't  connect to Redis server"}), 500
 
-        # Store the token in the cookie session & expire age at 5 days
-        res = jsonify({"message": "Success", "api-token": token})
-        res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
-        return res, 200
-    else:
-        return jsonify({"error": "Incorrect password"}), 401
+            # Store the token in the cookie session & expire age at 5 days
+            res = jsonify({"message": "Success", "api-token": token})
+            res.set_cookie('api-token', token, max_age=60 * 60 * 24 * 5)
+            return res, 200
+        else:
+            return jsonify({"error": "Incorrect password"}), 401
+    except Exception as err:
+        print(err)
+        return jsonify({'error': 'Server is unavailable'}), 500
 
 
 @auth.route('/api/v1/register', methods=['POST'])
