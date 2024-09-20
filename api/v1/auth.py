@@ -26,22 +26,22 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    try:
-        username: str = request.form.get("username", None).lower()
-        password: str = request.form.get("password", None)
-        if username is None:
-            return jsonify({"error": "Missing username"}), 400
-        if password is None:
-            return jsonify({"error": "Missing password"}), 400
+    username: str = request.form.get("username", None)
+    password: str = request.form.get("password", None)
+    if username is None:
+        return jsonify({"error": "Missing username"}), 400
+    if password is None:
+        return jsonify({"error": "Missing password"}), 400
 
-        # make call to database to fetch user data and compare it
-        user = db.session.query(User).filter_by(username=username).first()
-        if user is None:
-            return jsonify({"error": "Invalid username"}), 401
-        if check_password_hash(user.password, password):
-            # store the token on the user cookie with key & token as value
-            if not user.isActive:
-                return jsonify({"error": "User account is inactive"}), 403
+    username = username.strip().lower()
+    # make call to database to fetch user data and compare it
+    user = db.session.query(User).filter_by(username=username).first()
+    if user is None:
+        return jsonify({"error": "Invalid username"}), 401
+    if check_password_hash(user.password, password):
+        # store the token on the user cookie with key & token as value
+        if not user.isActive:
+            return jsonify({"error": "User account is inactive"}), 403
 
             token: str = str(uuid4())
 
