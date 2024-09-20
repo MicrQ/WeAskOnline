@@ -58,9 +58,6 @@ def login():
             return res, 200
         else:
             return jsonify({"error": "Incorrect password"}), 401
-    except Exception as err:
-        print(err)
-        return jsonify({'error': 'Server is unavailable'}), 500
 
 
 @auth.route('/api/v1/register', methods=['POST'])
