@@ -26,13 +26,14 @@ def login():
         string token and a response status to indicate a successful
         login of the user
     """
-    username: str = request.form.get("username", None).lower()
+    username: str = request.form.get("username", None)
     password: str = request.form.get("password", None)
     if username is None:
         return jsonify({"error": "Missing username"}), 400
     if password is None:
         return jsonify({"error": "Missing password"}), 400
 
+    username = username.strip().lower()
     # make call to database to fetch user data and compare it
     user = db.session.query(User).filter_by(username=username).first()
     if user is None:
