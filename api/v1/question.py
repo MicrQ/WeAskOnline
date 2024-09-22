@@ -181,9 +181,25 @@ def get_question(id, title=None):
         question_id=question['id']).all()
     question['comments'] = [comment.to_dict() for comment in comments]
     for comment in question['comments']:
+        comment['upvotes'] = 0
+        comment['downvotes'] = 0
+        for vote in db.session.query(Vote).filter_by(parent_type='comment', parent_id=comment.get("id")).all():
+            if vote.is_upvote:
+                comment['upvotes'] += 1
+            else:
+                comment['downvotes'] += 1
         replies = db.session.query(Reply).filter_by(
             comment_id=comment['id']).all()
         comment['replies'] = [reply.to_dict() for reply in replies]
+
+        for reply in comment['replies']:
+            reply['upvotes'] = 0
+            reply['downvotes'] = 0
+            for reply in db.session.query(Vote).filter_by(parent_type='reply', parent_id=reply.get("id")).all():
+                if reply.is_upvote:
+                    reply['upvotes'] += 1
+                else:
+                    reply['downvotes'] += 1
 
     votes = db.session.query(Vote).filter_by(
         parent_id=question['id'], parent_type='question').all()
@@ -192,7 +208,7 @@ def get_question(id, title=None):
     question['upvotes'] = 0
     question['downvotes'] = 0
     for vote in votes:
-        if vote.isUpvote:
+        if vote.is_upvote:
             question['upvotes'] += 1
         else:
             question['downvotes'] += 1
